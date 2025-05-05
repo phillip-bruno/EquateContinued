@@ -1,16 +1,19 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Top-level build file for Android app targeting Android 13 (API Level 33)
+// Ensure your Gradle wrapper is updated to support the new Android Gradle Plugin.
 buildscript {
     repositories {
-        jcenter()
         google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        // Upgraded Gradle Plugin to support new features and API levels
+        classpath 'com.android.tools.build:gradle:8.1.1'
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
+        google()
+        mavenCentral()
     }
 }
