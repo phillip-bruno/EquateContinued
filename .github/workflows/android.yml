@@ -1,29 +1,32 @@
-name: Android CI
+name: 'Setup Android SDK Tools'
+author: 'Android-Actions'
+description: 'Setup the Android SDK Tools and add them to the path'
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+inputs:
+  cmdline-tools-version:
+    description: 'cmdline-tools-version. See https://developer.android.com/studio#command-line-tools-only'
+    required: false
+    default: '12266719'
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  accept-android-sdk-licenses:
+    description: 'Android SDK is usable only after the license agreement. Should setup-android agree to the licences, provided by "sdkmanager --licenses"'
+    required: false
+    default: 'true'
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: '17'
+  log-accepted-android-sdk-licenses:
+    description: 'Should accepted licenses be logged. If not, accepted licences will be accepted silently'
+    required: false
+    default: 'true'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
-        # The 'api-level' input is not supported in this version, so it's been removed.
+  packages:
+    description: 'Additional packages to install'
+    required: false
+    default: 'tools platform-tools'
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+runs:
+  using: node20
+  main: 'dist/index.js'
+
+branding:
+  icon: 'list'
+  color: 'green'
