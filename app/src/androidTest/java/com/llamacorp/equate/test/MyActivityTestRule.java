@@ -79,12 +79,14 @@ class MyActivityTestRule<A extends CalcActivity> extends ActivityTestRule<A> {
 
 
 	private void resetSharedPrefs() {
-		File root = getTargetContext().getFilesDir().getParentFile();
+		File root = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+				.getTargetContext().getFilesDir().getParentFile();
 		String[] sharedPreferencesFileNames = new File(root, "shared_prefs").list();
 		if (sharedPreferencesFileNames == null) return;
 		for (String fileName : sharedPreferencesFileNames) {
-			SharedPreferences sp = InstrumentationRegistry.getTargetContext()
-					  .getSharedPreferences(fileName.replace(".xml", ""), Context.MODE_PRIVATE);
+			SharedPreferences sp = InstrumentationRegistry.getInstrumentation()
+					.getTargetContext()
+					.getSharedPreferences("your_shared_preferences", Context.MODE_PRIVATE);
 			sp.edit().clear().apply();
 			File fileToDelete = new File(root + "/shared_prefs/" + fileName);
 			boolean wasSuccessful = fileToDelete.delete();

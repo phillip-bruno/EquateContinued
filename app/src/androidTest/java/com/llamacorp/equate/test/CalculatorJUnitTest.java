@@ -1,50 +1,89 @@
-package com.llamacorp.equate;
+package com.llamacorp.equate.test;
 
-import android.test.mock.MockResources;
+import android.content.res.Resources;
 
-import junit.framework.TestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import java.math.BigDecimal;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+
 import java.math.MathContext;
+import java.math.BigDecimal;
 
-public class CalculatorJUnitTest extends TestCase {
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import com.llamacorp.equate.Calculator;
+import com.llamacorp.equate.R;
+import com.llamacorp.equate.Solver;
 
-	//THIS STUFF IS THE SAME AS CALC
-	//we want the display precision to be a bit less than calculated
-	//private MathContext mcOperate = new MathContext(intCalcPrecision);
-	private MathContext mcDisp = new MathContext(intDisplayPrecision);
+@RunWith(AndroidJUnit4.class)
+public class CalculatorJUnitTest {
 
-	//precision for all calculations
-	public static final int intDisplayPrecision = 15;
-	public static final int intCalcPrecision = intDisplayPrecision + 2;
+	// Precision for display and calculations
+	public static final int INT_DISPLAY_PRECISION = 15;
+	public static final int INT_CALC_PRECISION = INT_DISPLAY_PRECISION + 2;
+	private MathContext mcDisp = new MathContext(INT_DISPLAY_PRECISION);
 
 	/**
-	 * Used to get a test calculator with a mocked resource file
+	 * Returns a test Calculator instance with a mocked Resources object.
+	 * We use Mockito to simulate the resource array corresponding to
+	 * R.array.unit_type_array_combined.
 	 *
-	 * @return test calculator
+	 * @return a test Calculator instance
 	 */
-	private Calculator getTestCalc() {
-		//TODO make this into something cleaner--use Mockito to completely fake the resource
-		MockResources mockResources = new MockResources() {
-			@Override
-			public String[] getStringArray(int id) {
-				if (id == R.array.unit_type_array_combined){
-					return new String[]{"key_currency|Currency|Currency", "key_temp|Temperature|Temp", "key_weight|Weight|Weight", "key_len|Length|Length", "key_area|Area|Area", "key_vol|Volume|Volume", "key_speed|Speed|Speed", "key_time|Time|Time", "key_fuel|FuelEconomy|FuelEco", "key_power|Power|Power", "key_energy|Energy|Energy", "key_force|Force|Force", "key_torque|Torque|Torque", "key_pressure|Pressure|Pressure", "key_digital|DigitalStorage|Digital"};
-				}
-				return null;
-			}
+	static Calculator getTestCalc() {
+		Resources mockResources = Mockito.mock(Resources.class);
+
+		// Assuming R.array.unit_type_array_combined exists and is defined in your resources.
+		int resourceId = R.array.unit_type_array_combined;
+		String[] unitTypeArray = new String[]{
+				"key_currency|Currency|Currency",
+				"key_temp|Temperature|Temp",
+				"key_weight|Weight|Weight",
+				"key_len|Length|Length",
+				"key_area|Area|Area",
+				"key_vol|Volume|Volume",
+				"key_speed|Speed|Speed",
+				"key_time|Time|Time",
+				"key_fuel|FuelEconomy|FuelEco",
+				"key_power|Power|Power",
+				"key_energy|Energy|Energy",
+				"key_force|Force|Force",
+				"key_torque|Torque|Torque",
+				"key_pressure|Pressure|Pressure",
+				"key_digital|DigitalStorage|Digital"
 		};
+
+		Mockito.when(mockResources.getStringArray(resourceId)).thenReturn(unitTypeArray);
 		return Calculator.getTestCalculator(mockResources);
 	}
 
-
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Test
+	public void sampleTest() {
+		Calculator calc = getTestCalc();
+		// A simple assertion to confirm our Calculator instance is not null.
+		assertNotNull("Expected non-null Calculator instance.", calc);
+		// Additional test cases here...
 	}
 
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@Before
+	public void setUp() throws Exception {
+		// Place your setup code here
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		// Place your cleanup code here
+	}
+
+	@Test
+	public void testSomething() {
+		// Your test code here
 	}
 
 	public void testParseKeyPressed() {

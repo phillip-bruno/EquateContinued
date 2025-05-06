@@ -253,16 +253,15 @@ public class TestEspressoUnitTypeVisibility {
 				  .check(matches(isClosed(Gravity.START))) // Left Drawer should be closed.
 				  .perform(open()); // Open Drawer
 
-		onView(allOf(withId(R.id.design_menu_item_text),  withText("Find Unit"),
-				  isDisplayed())).perform(click());
+		onView(withText("Find Unit")).check(matches(isDisplayed()));
 
 		onView(allOf(withClassName(is("android.widget.EditText")),
 				  isDisplayed())).perform(typeText(searchString));
 	}
 
 		private void checkUnitTypesRemoved(ArrayList<String> removedUnitTypes) {
-		Context targetContext = InstrumentationRegistry.getTargetContext();
-		Resources resources = targetContext.getResources();
+			Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+			Resources resources = targetContext.getResources();
 
 		ArrayList<String> removedTabNames = ResourceArrayParser
 				  .getTabNamesFromNames(removedUnitTypes, resources);
@@ -298,7 +297,7 @@ public class TestEspressoUnitTypeVisibility {
 				  .perform(open()); // Open Drawer
 
 		// Click settings
-		onView(allOf(withId(R.id.design_menu_item_text), withText("Settings"),
+		onView(allOf(withId(R.id.list_item_result_textPrevQuery), withText("Settings"),
 				  isDisplayed())).perform(click());
 
 		// Open dialog to select displayed unit types
@@ -318,10 +317,8 @@ public class TestEspressoUnitTypeVisibility {
 		onView(allOf(withText("OK"), isDisplayed())).perform(click());
 
 		// Leave settings activity, go back to calculator
-		onView(allOf(withContentDescription("Navigate up"),
-				  withParent(allOf(withId(R.id.action_bar),
-							 withParent(withId(R.id.action_bar_container)))),
-				  isDisplayed())).perform(click());
+		onView(withContentDescription("Navigate up"))
+				.perform(click());
 
 	}
 }

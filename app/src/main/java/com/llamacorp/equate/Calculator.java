@@ -81,7 +81,7 @@ public class Calculator {
 	}
 
 	//------THIS IS FOR TESTING ONLY-----------------
-	static Calculator getTestCalculator(Resources mockResources) {
+	public static Calculator getTestCalculator(Resources mockResources) {
 		mCalculator = new Calculator(mockResources);
 		return mCalculator;
 	}
