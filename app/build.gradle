@@ -50,25 +50,20 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     // If you don't have flavors, you can remove the empty productFlavors block.
     // productFlavors {}
 }
 
 dependencies {
     // For production code, use 'implementation'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.test.espresso:espresso-core:3.6.1'
 
     // For unit tests that run on the JVM, use 'testImplementation'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 
     // For Android instrumentation tests, use 'androidTestImplementation'
-    androidTestImplementation 'com.google.android.material:material:1.9.0'
+    androidTestImplementation 'com.google.android.material:material:1.12.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.6.1'
 }

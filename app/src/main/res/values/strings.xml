@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-   <string name="app_name">Equate</string>
+   <string name="app_name">EquateContinued</string>
    <string name="app_phrase">unit converting calculator</string>
    <string name="action_settings">Settings</string>
 
@@ -59,7 +59,7 @@
 
    <string name="about_title">About Equate</string>
    <string name="about_version">Version: </string>
-   <string name="about_message">Comments, bugs, suggestions, or if you would like to tip the dev: github.com/EvanRespaut/Equate</string>
+   <string name="about_message"> </string>
 
    <string name="click_another_unit">Click a different unit to perform a conversion</string>
 
@@ -87,7 +87,7 @@
    <string name="about">About</string>
    <string name="find_unit">Find Unit</string>
    <string name="find_unit_hint">Find unit:</string>
-   <string name="whats_new">What's new in v2.0.1</string>
+   <string name="whats_new">What is new in v2.0.1</string>
    <string name="version_description">—  Support for Android 15</string>
 
 
