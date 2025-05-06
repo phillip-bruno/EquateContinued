@@ -3,11 +3,11 @@ package com.llamacorp.equate.test;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.FailureHandler;
-import android.support.test.espresso.NoMatchingViewException;
-import android.support.test.espresso.base.DefaultFailureHandler;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.espresso.FailureHandler;
+import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.base.DefaultFailureHandler;
+import androidx.test.rule.ActivityTestRule;
 import android.util.Log;
 import android.view.View;
 
@@ -17,10 +17,11 @@ import org.hamcrest.Matcher;
 
 import java.io.File;
 
-import static android.support.test.InstrumentationRegistry.getTargetContext;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
 
 /**
  * This class was created to allow for custom setup and tear down code before

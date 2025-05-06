@@ -1,8 +1,8 @@
 package com.llamacorp.equate.test;
 
 
-import android.support.test.espresso.Espresso;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.espresso.Espresso;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.llamacorp.equate.test.IdlingResource.ViewPagerIdlingResource;
 import com.llamacorp.equate.view.CalcActivity;
@@ -13,11 +13,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.registerIdlingResources;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.llamacorp.equate.test.EspressoTestUtils.assertExpressionEquals;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.registerIdlingResources;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;import static com.llamacorp.equate.test.EspressoTestUtils.assertExpressionEquals;
 import static com.llamacorp.equate.test.EspressoTestUtils.assertResultPreviewEquals;
 import static com.llamacorp.equate.test.EspressoTestUtils.assertResultPreviewInvisible;
 import static com.llamacorp.equate.test.EspressoTestUtils.clickButtons;

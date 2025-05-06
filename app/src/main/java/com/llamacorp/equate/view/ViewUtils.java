@@ -103,11 +103,12 @@ public class ViewUtils {
 			boolean isTest;
 
 			try {
-				Class.forName("android.support.test.espresso.Espresso");
+				Class.forName("androidx.test.espresso.Espresso");
 				isTest = true;
 			} catch (ClassNotFoundException e) {
 				isTest = false;
 			}
+
 
 			isRunningTest = new AtomicBoolean(isTest);
 		}

@@ -1,7 +1,7 @@
 package com.llamacorp.equate.test.IdlingResource;
 
-import android.support.test.espresso.IdlingResource;
-import android.support.v4.view.ViewPager;
+import androidx.test.espresso.IdlingResource;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  *  Idling resource that waits for a view pager to finish it's scroll animation

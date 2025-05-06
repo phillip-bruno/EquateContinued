@@ -14,18 +14,18 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.navigation.NavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -235,53 +235,42 @@ public class CalcActivity extends AppCompatActivity
 				public void onClick(View view) {
 					int buttonId = view.getId();
 					String buttonValue = "";
-					switch (buttonId) {
-						case R.id.plus_button:
-							buttonValue = "+";
-							break;
-						case R.id.minus_button:
-							buttonValue = "-";
-							break;
-						case R.id.multiply_button:
-							buttonValue = "*";
-							break;
-						case R.id.divide_button:
-							buttonValue = "/";
-							break;
-						case R.id.percent_button:
-							if (mCalc.mPreferences.getPercentButMain().equals("%"))
-								buttonValue = "%";
-							else
-								buttonValue = "E";
-							break;
-						case R.id.decimal_button:
-							buttonValue = ".";
-							break;
-						case R.id.equals_button:
-							buttonValue = "=";
-							break;
-						//					case R.id.ee_button: buttonValue="E";
-						//					break;
-						//					case R.id.power_button: buttonValue="^";
-						//					break;
-						case R.id.clear_button:
-							buttonValue = "c";
-							break;
-						case R.id.open_para_button:
-							buttonValue = "(";
-							break;
-						case R.id.close_para_button:
-							buttonValue = ")";
-							break;
-						case R.id.backspace_button:
-							buttonValue = "b";
-							break;
-						default:
-							//this for loop checks for numerical values
-							for (int i = 0; i < 10; i++)
-								if (buttonId == BUTTON_IDS[i])
-									buttonValue = String.valueOf(i);
+					if (buttonId == R.id.plus_button) {
+						buttonValue = "+";
+					} else if (buttonId == R.id.minus_button) {
+						buttonValue = "-";
+					} else if (buttonId == R.id.multiply_button) {
+						buttonValue = "*";
+					} else if (buttonId == R.id.divide_button) {
+						buttonValue = "/";
+					} else if (buttonId == R.id.percent_button) {
+						if (mCalc.mPreferences.getPercentButMain().equals("%")) {
+							buttonValue = "%";
+						} else {
+							buttonValue = "E";
+						}
+					} else if (buttonId == R.id.decimal_button) {
+						buttonValue = ".";
+					} else if (buttonId == R.id.equals_button) {
+						buttonValue = "=";
+					} else if (buttonId == R.id.clear_button) {
+						buttonValue = "c";
+					} else if (buttonId == R.id.open_para_button) {
+						buttonValue = "(";
+					} else if (buttonId == R.id.close_para_button) {
+						buttonValue = ")";
+					} else if (buttonId == R.id.backspace_button) {
+						buttonValue = "b";
+					} else {
+						// This loop checks for numerical values
+						for (int i = 0; i < 10; i++) {
+							if (buttonId == BUTTON_IDS[i]) {
+								buttonValue = String.valueOf(i);
+								break;
+							}
+						}
 					}
+
 					//pass button to calc, change convert key colors (maybe) and update screen
 					numButtonPressed(buttonValue);
 				}
@@ -292,46 +281,35 @@ public class CalcActivity extends AppCompatActivity
 				public boolean onLongClick(View view) {
 					int buttonId = view.getId();
 					String buttonValue = "";
-					switch (buttonId) {
-						case R.id.multiply_button:
-							buttonValue = "^";
-							break;
-						case R.id.clear_button:
-							resetDialog();
-							break;
-						case R.id.equals_button:
-							//buttonValue = "g";
-							DrawerLayout drawer =
-									  (DrawerLayout) findViewById(R.id.drawer_layout);
-							drawer.openDrawer(GravityCompat.START);
-							break;
-						case R.id.percent_button:
-							if (mCalc.mPreferences.getPercentButSec().equals("EE"))
-								buttonValue = "E";
-							else
-								buttonValue = "%";
-							break;
-						case R.id.nine_button:
-							mCalc.refreshAllDynamicUnits(true);
-							break;
-						case R.id.minus_button:
-							buttonValue = "n";
-							break;
-						case R.id.divide_button:
-							buttonValue = "i";
-							break;
-						case R.id.eight_button:
-							setUnitViewVisibility(UnitVisibility.TOGGLE);
-							break;
-						case R.id.open_para_button:
-							buttonValue = "[";
-							break;
-						case R.id.close_para_button:
-							buttonValue = "]";
-							break;
-						default:
-							return false;
+					if (buttonId == R.id.multiply_button) {
+						buttonValue = "^";
+					} else if (buttonId == R.id.clear_button) {
+						resetDialog();
+					} else if (buttonId == R.id.equals_button) {
+						DrawerLayout drawer = findViewById(R.id.drawer_layout);
+						drawer.openDrawer(GravityCompat.START);
+					} else if (buttonId == R.id.percent_button) {
+						if (mCalc.mPreferences.getPercentButSec().equals("EE")) {
+							buttonValue = "E";
+						} else {
+							buttonValue = "%";
+						}
+					} else if (buttonId == R.id.nine_button) {
+						mCalc.refreshAllDynamicUnits(true);
+					} else if (buttonId == R.id.minus_button) {
+						buttonValue = "n";
+					} else if (buttonId == R.id.divide_button) {
+						buttonValue = "i";
+					} else if (buttonId == R.id.eight_button) {
+						setUnitViewVisibility(UnitVisibility.TOGGLE);
+					} else if (buttonId == R.id.open_para_button) {
+						buttonValue = "[";
+					} else if (buttonId == R.id.close_para_button) {
+						buttonValue = "]";
+					} else {
+						return false;
 					}
+
 					//pass button to calc, change convert key colors (maybe) and update screen
 					if (!buttonValue.equals(""))
 						numButtonPressed(buttonValue);

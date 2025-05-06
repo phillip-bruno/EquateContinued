@@ -9,56 +9,66 @@ allprojects {
 }
 
 android {
-    compileSdkVersion 33
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
+
+
+    namespace 'com.llamacorp.equate'
+    compileSdkVersion 35
     // Option 1: Let Gradle choose the build tools version automatically by omitting buildToolsVersion
     // Option 2: Explicitly use a more recent version
-    buildToolsVersion "33.0.0"
-    
+    buildToolsVersion "35.0.0"
+
     useLibrary 'org.apache.http.legacy'
-    
+
     defaultConfig {
         applicationId "com.llamacorp.equate"
         // If you want to restrict your app to Android 13 and above:
-        minSdkVersion 33
-        // Update target SDK to 33
-        targetSdkVersion 33
+        minSdkVersion 35
 
         testApplicationId "com.llamacorp.equate.test"
         // Migrate to AndroidX test runner if possible:
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
-    
+
     buildTypes {
         release {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                          'proguard-rules.pro'
+                    'proguard-rules.pro'
         }
     }
-    
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    
+
     // If you don't have flavors, you can remove the empty productFlavors block.
     // productFlavors {}
 }
 
 dependencies {
-    compile 'com.android.support:design:26.1.0'
-    compile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support:design:26.1.0'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
-    androidTestCompile 'com.android.support.test.espresso:espresso-contrib:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'com.android.support', module: 'recyclerview-v7'
-        exclude group: 'com.android.support', module: 'design'
-    }
-    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+    // For production code, use 'implementation'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.test.espresso:espresso-core:3.6.1'
+
+    // For unit tests that run on the JVM, use 'testImplementation'
+    testImplementation 'junit:junit:4.12'
+
+    // For Android instrumentation tests, use 'androidTestImplementation'
+    androidTestImplementation 'com.google.android.material:material:1.9.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.6.1'
 }
