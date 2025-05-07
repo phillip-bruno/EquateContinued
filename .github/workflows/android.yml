@@ -24,7 +24,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Update Gradle Wrapper
-        run: ./gradlew wrapper --gradle-version 8.10.0 --distribution-type all
+        run: ./gradlew wrapper --gradle-version 8.11.1 --distribution-type all
 
       - name: Build with Gradle
         run: ./gradlew build
