@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         // Upgraded Gradle Plugin to support new features and API levels
-        classpath 'com.android.tools.build:gradle:8.9.2'
+        classpath 'com.android.tools.build:gradle:8.10.0'
     }
 }
 
