@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.graphics.Paint;
 import android.os.SystemClock;
 import android.text.InputType;
 import android.util.AttributeSet;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.llamacorp.equate.Calculator;
@@ -24,8 +22,10 @@ import com.llamacorp.equate.R;
 import com.llamacorp.equate.SISuffixHelper;
 
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
 
-public class EditTextDisplay extends EditText {
+public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText {
     //TODO might not need this
     // (This was in the original TextView) System wide time for last cut or copy action.
     static long LAST_CUT_OR_COPY_TIME;
@@ -140,35 +140,30 @@ public class EditTextDisplay extends EditText {
             Integer colorTo = Color.WHITE;
             final int ANIMATE_DURR = 600; //ms
             mColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
-            mColorAnimation.addUpdateListener(new AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animator) {
-                    String coloredExp;
-                    //if the highlight got canceled during the async animation update, cancel
-                    if (!mCalc.isHighlighted()) {
-                        animator.cancel();
-                        coloredExp = mExpressionText;
-                    } else {
-                        ArrayList<Integer> highList = mCalc.getHighlighted();
-                        highList = mSepHandler.translateIndexListToSep(highList);
-                        int color = (Integer) animator.getAnimatedValue();
-                        int len = highList.size();
-                        coloredExp = mExpressionText.substring(0, highList.get(0));
-                        for (int i = 0; i < len; i++) {
-                            int finish = mExpressionText.length();
-                            if (i != len - 1) finish = highList.get(i + 1);
-                            coloredExp = coloredExp + "<font color='" + color + "'>" +
-                                    mExpressionText.substring(highList.get(i), highList.get(i) + 1) +
-                                    "</font>" + mExpressionText.substring(highList.get(i) + 1, finish);
-                        }
+            mColorAnimation.addUpdateListener(animator -> {
+                StringBuilder coloredExp;
+                //if the highlight got canceled during the async animation update, cancel
+                if (!mCalc.isHighlighted()) {
+                    animator.cancel();
+                    coloredExp = Optional.ofNullable(mExpressionText).map(StringBuilder::new).orElse(null);
+                } else {
+                    ArrayList<Integer> highList = mCalc.getHighlighted();
+                    highList = mSepHandler.translateIndexListToSep(highList);
+                    int color = (Integer) animator.getAnimatedValue();
+                    int len = highList.size();
+                    coloredExp = new StringBuilder(mExpressionText.substring(0, highList.getFirst()));
+                    for (int i = 0; i < len; i++) {
+                        int finish = mExpressionText.length();
+                        if (i != len - 1) finish = highList.get(i + 1);
+                        coloredExp.append("<font color='").append(color).append("'>").append(mExpressionText.charAt(highList.get(i))).append("</font>").append(mExpressionText.substring(highList.get(i) + 1, finish));
                     }
-
-                    //update the main display
-                    setTextHtml(coloredExp);
-
-                    //updating the text restarts selection to 0,0, so load in the current selection
-                    setSelection(mSelStart, mSelEnd);
                 }
+
+                //update the main display
+                setTextHtml(coloredExp == null ? null : coloredExp.toString());
+
+                //updating the text restarts selection to 0,0, so load in the current selection
+                setSelection(mSelStart, mSelEnd);
             });
             mColorAnimation.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -249,7 +244,7 @@ public class EditTextDisplay extends EditText {
         if (mTextSize != 0f) paint.setTextSize(mTextSize);
         //if min text size is the same as normal size, just leave
         if (mMinTextSize == getTextSize()) return;
-        float textWidth = paint.measureText(getText().toString());
+        float textWidth = paint.measureText(Objects.requireNonNull(getText()).toString());
         float boxWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         float textSize = getTextSize();
         if (textWidth > boxWidth) {
@@ -291,7 +286,7 @@ public class EditTextDisplay extends EditText {
         int selStart = getSelectionStart();
         int selEnd = getSelectionEnd();
 
-        CharSequence copiedText = getText().subSequence(selStart, selEnd);
+        CharSequence copiedText = Objects.requireNonNull(getText()).subSequence(selStart, selEnd);
 
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(ClipData.newPlainText(null, copiedText));
@@ -313,7 +308,7 @@ public class EditTextDisplay extends EditText {
         String textToPaste;
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboard.getPrimaryClip();
-        textToPaste = clip.getItemAt(0).coerceToText(getContext()).toString();
+        textToPaste = Objects.requireNonNull(clip).getItemAt(0).coerceToText(getContext()).toString();
         Toast.makeText(mContext, "Pasted: \"" + textToPaste + "\"", Toast.LENGTH_SHORT).show();
         mCalc.pasteIntoExpression(textToPaste);
     }
@@ -321,6 +316,7 @@ public class EditTextDisplay extends EditText {
 
     @Override
     protected void onSelectionChanged(int selStart, int selEnd) {
+        super.onSelectionChanged(selStart, selEnd);
         if (mCalc != null) {
             int preLen = mTextPrefix.length();
             int expLen = mExpressionText.length();
