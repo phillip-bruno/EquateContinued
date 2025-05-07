@@ -30,7 +30,7 @@
 //import java.util.HashMap;
 //import java.util.Map;
 //
-///**
+/// **
 // * FOR THESE TESTS TO WORK, BE SURE SCREEN IS ON
 // * Also remember that backspace uses touch events instead of clicks
 // */

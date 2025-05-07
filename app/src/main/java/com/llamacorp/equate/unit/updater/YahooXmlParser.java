@@ -31,187 +31,191 @@ import java.util.Locale;
  * This class parses XML feeds from
  * http://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote
  */
-public class YahooXmlParser extends CurrencyURLParser{
-	private static final String YAHOO_API_URL =
-			  "https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote";
-	private static final String ns = null; // We don't use namespaces
+public class YahooXmlParser extends CurrencyURLParser {
+    private static final String YAHOO_API_URL =
+            "https://finance.yahoo.com/webservice/v1/symbols/allcurrencies/quote";
+    private static final String ns = null; // We don't use namespaces
 
-	/** Constructor that initializes the base method's URL */
-	YahooXmlParser() {
-		super(YAHOO_API_URL);
-	}
-
-
-	/**
-	 * Parse a stream of XML data and extract currency rates and times.
-	 * @param stream input XML stream to parse
-	 * @return a HashMap of all the symbols and prices from the XML stream
-	 * @throws CurrencyParseException if there is any problem parsing the stream
-	 */
-	@Override
-	protected HashMap<String, Entry> parse(InputStream stream) throws CurrencyParseException {
-		try {
-			XmlPullParser parser = Xml.newPullParser();
-			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-			parser.setInput(stream, null);
-			parser.nextTag();
-			return findResources(parser);
-		} catch (IOException | XmlPullParserException e) {
-			throw new CurrencyParseException(e.getMessage());
-		}
-	}
-
-	/**
-	 * Iterates over the top level XML branch called list, looking for the first
-	 * "resources" tag. Note that we only expect to find one.
-	 * @param parser XML parser from Yahoo
-	 * @return a HashMap of entries
-	 */
-	private HashMap<String, Entry> findResources(XmlPullParser parser)
-			  throws XmlPullParserException, IOException {
-		HashMap<String, Entry> entries = new HashMap<>();
-
-		parser.require(XmlPullParser.START_TAG, ns, "list");
-		while (parser.next() != XmlPullParser.END_TAG) {
-			if (parser.getEventType() != XmlPullParser.START_TAG){
-				continue;
-			}
-			String name = parser.getName();
-			// Starts by looking for the resources tag
-			if (name.equals("resources")){
-				entries = readListOfResources(parser);
-			} else {
-				skip(parser);
-			}
-		}
-		return entries;
-	}
+    /**
+     * Constructor that initializes the base method's URL
+     */
+    YahooXmlParser() {
+        super(YAHOO_API_URL);
+    }
 
 
-	/**
-	 * Iterates through each "resource" tag in the "resources" parent. Each
-	 * currency should have it's own "resource" tag.
-	 */
-	private HashMap<String, Entry> readListOfResources(XmlPullParser parser)
-			  throws XmlPullParserException, IOException {
-		HashMap<String, Entry> entries = new HashMap<>();
+    /**
+     * Parse a stream of XML data and extract currency rates and times.
+     *
+     * @param stream input XML stream to parse
+     * @return a HashMap of all the symbols and prices from the XML stream
+     * @throws CurrencyParseException if there is any problem parsing the stream
+     */
+    @Override
+    protected HashMap<String, Entry> parse(InputStream stream) throws CurrencyParseException {
+        try {
+            XmlPullParser parser = Xml.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(stream, null);
+            parser.nextTag();
+            return findResources(parser);
+        } catch (IOException | XmlPullParserException e) {
+            throw new CurrencyParseException(e.getMessage());
+        }
+    }
 
-		parser.require(XmlPullParser.START_TAG, ns, "resources");
-		while (parser.next() != XmlPullParser.END_TAG) {
-			if (parser.getEventType() != XmlPullParser.START_TAG){
-				continue;
-			}
-			String name = parser.getName();
-			// Starts by looking for the resource tag
-			if (name.equals("resource")){
-				if (parser.isEmptyElementTag()){
-					skip(parser);
-				}
-				Entry ent = readResource(parser);
-				if (ent != null){
-					entries.put(ent.symbol, ent);
-				}
-			} else {
-				skip(parser);
-			}
-		}
-		return entries;
-	}
+    /**
+     * Iterates over the top level XML branch called list, looking for the first
+     * "resources" tag. Note that we only expect to find one.
+     *
+     * @param parser XML parser from Yahoo
+     * @return a HashMap of entries
+     */
+    private HashMap<String, Entry> findResources(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        HashMap<String, Entry> entries = new HashMap<>();
 
-	/**
-	 * Parses the contents of a currency entry. If it encounters a price,
-	 * summary, or symbol tag, hands them off to their respective methods for
-	 * processing. Otherwise, skips the tag.
-	 *
-	 * @throws XmlPullParserException
-	 * @throws IOException
-	 */
-	private Entry readResource(XmlPullParser parser) throws XmlPullParserException, IOException {
-		parser.require(XmlPullParser.START_TAG, ns, "resource");
-		String price = null;
-		String symbol = null;
-		Date date = null;
-		while (parser.next() != XmlPullParser.END_TAG) {
-			if (parser.getEventType() != XmlPullParser.START_TAG){
-				continue;
-			}
-			//read in name attribute (ie in <field name="symbol">XAG=X</field>
-			//this will be "symbol")
-			String name = parser.getAttributeValue(null, "name");
-			switch (name) {
-				case "price":
-					price = readPrice(parser);
-					break;
-				case "symbol":
-					symbol = readSymbol(parser);
+        parser.require(XmlPullParser.START_TAG, ns, "list");
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            // Starts by looking for the resources tag
+            if (name.equals("resources")) {
+                entries = readListOfResources(parser);
+            } else {
+                skip(parser);
+            }
+        }
+        return entries;
+    }
 
-					break;
-				case "utctime":
-					SimpleDateFormat sdf =
-							  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
 
-					try {
-						date = sdf.parse(readSymbol(parser));
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-					break;
-				default:
-					skip(parser);
-					break;
-			}
-		}
-		if (price == null || symbol == null || date == null){
-			return null;
-		}
-		return new Entry(Double.parseDouble(price), symbol, date);
-	}
+    /**
+     * Iterates through each "resource" tag in the "resources" parent. Each
+     * currency should have it's own "resource" tag.
+     */
+    private HashMap<String, Entry> readListOfResources(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        HashMap<String, Entry> entries = new HashMap<>();
 
-	// Processes price tags in the feed.
-	private String readPrice(XmlPullParser parser) throws IOException, XmlPullParserException {
-		parser.require(XmlPullParser.START_TAG, ns, "field");
-		String price = readText(parser);
-		parser.require(XmlPullParser.END_TAG, ns, "field");
-		return price;
-	}
+        parser.require(XmlPullParser.START_TAG, ns, "resources");
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            // Starts by looking for the resource tag
+            if (name.equals("resource")) {
+                if (parser.isEmptyElementTag()) {
+                    skip(parser);
+                }
+                Entry ent = readResource(parser);
+                if (ent != null) {
+                    entries.put(ent.symbol, ent);
+                }
+            } else {
+                skip(parser);
+            }
+        }
+        return entries;
+    }
 
-	// Processes summary tags in the feed.
-	private String readSymbol(XmlPullParser parser) throws IOException, XmlPullParserException {
-		parser.require(XmlPullParser.START_TAG, ns, "field");
-		String symbol = readText(parser);
-		//symbol seems to have "=X" after, cut this off
-		symbol = symbol.replace("=X", "");
-		parser.require(XmlPullParser.END_TAG, ns, "field");
-		return symbol;
-	}
+    /**
+     * Parses the contents of a currency entry. If it encounters a price,
+     * summary, or symbol tag, hands them off to their respective methods for
+     * processing. Otherwise, skips the tag.
+     *
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    private Entry readResource(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "resource");
+        String price = null;
+        String symbol = null;
+        Date date = null;
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            //read in name attribute (ie in <field name="symbol">XAG=X</field>
+            //this will be "symbol")
+            String name = parser.getAttributeValue(null, "name");
+            switch (name) {
+                case "price":
+                    price = readPrice(parser);
+                    break;
+                case "symbol":
+                    symbol = readSymbol(parser);
 
-	// For the tags price and summary, extracts their text values.
-	private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-		String result = "";
-		if (parser.next() == XmlPullParser.TEXT){
-			result = parser.getText();
-			parser.nextTag();
-		}
-		return result;
-	}
+                    break;
+                case "utctime":
+                    SimpleDateFormat sdf =
+                            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
 
-	// Skips tags the parser isn't interested in. Uses depth to handle nested tags. i.e.,
-	// if the next tag after a START_TAG isn't a matching END_TAG, it keeps going until it
-	// finds the matching END_TAG (as indicated by the value of "depth" being 0).
-	private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-		if (parser.getEventType() != XmlPullParser.START_TAG){
-			throw new IllegalStateException();
-		}
-		int depth = 1;
-		while (depth != 0) {
-			switch (parser.next()) {
-				case XmlPullParser.END_TAG:
-					depth--;
-					break;
-				case XmlPullParser.START_TAG:
-					depth++;
-					break;
-			}
-		}
-	}
+                    try {
+                        date = sdf.parse(readSymbol(parser));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    skip(parser);
+                    break;
+            }
+        }
+        if (price == null || symbol == null || date == null) {
+            return null;
+        }
+        return new Entry(Double.parseDouble(price), symbol, date);
+    }
+
+    // Processes price tags in the feed.
+    private String readPrice(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "field");
+        String price = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "field");
+        return price;
+    }
+
+    // Processes summary tags in the feed.
+    private String readSymbol(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "field");
+        String symbol = readText(parser);
+        //symbol seems to have "=X" after, cut this off
+        symbol = symbol.replace("=X", "");
+        parser.require(XmlPullParser.END_TAG, ns, "field");
+        return symbol;
+    }
+
+    // For the tags price and summary, extracts their text values.
+    private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String result = "";
+        if (parser.next() == XmlPullParser.TEXT) {
+            result = parser.getText();
+            parser.nextTag();
+        }
+        return result;
+    }
+
+    // Skips tags the parser isn't interested in. Uses depth to handle nested tags. i.e.,
+    // if the next tag after a START_TAG isn't a matching END_TAG, it keeps going until it
+    // finds the matching END_TAG (as indicated by the value of "depth" being 0).
+    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+            throw new IllegalStateException();
+        }
+        int depth = 1;
+        while (depth != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.END_TAG:
+                    depth--;
+                    break;
+                case XmlPullParser.START_TAG:
+                    depth++;
+                    break;
+            }
+        }
+    }
 }

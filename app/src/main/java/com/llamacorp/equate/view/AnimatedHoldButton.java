@@ -6,211 +6,208 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
 import com.llamacorp.equate.R;
 
 public class AnimatedHoldButton extends SecondaryTextButton {
-	private final int CLICK_HOLD_TIME;
+    private final int CLICK_HOLD_TIME;
 
-	protected float mSecAdditionalXOffset = getContext().getResources().
-			  getDimensionPixelSize(R.dimen.button_secondary_text_additional_offset_x);
-	protected float mSecAdditionalYOffset = getContext().getResources().
-			  getDimensionPixelSize(R.dimen.button_secondary_text_additional_offset_y);
-
-
-	private OnClickListener mClickListen = null;
-	private OnLongClickListener mLongClickListen = null;
-	private OnExtraLongClickListener mExtraLongClickListener = null;
-	private Handler mColorHoldHandler;
-	private boolean mLongClickPerformed = false;
-	private boolean mWaitingForExtraLongClick = false;
-	private Drawable mNormalDrawable;
-	private int mPressedColor;
-
-	//used to count up holding time
-	private int mHoldInc;
-
-	private String mPrimaryText;
+    protected float mSecAdditionalXOffset = getContext().getResources().
+            getDimensionPixelSize(R.dimen.button_secondary_text_additional_offset_x);
+    protected float mSecAdditionalYOffset = getContext().getResources().
+            getDimensionPixelSize(R.dimen.button_secondary_text_additional_offset_y);
 
 
-	public AnimatedHoldButton(Context context, AttributeSet attrs) {
-		super(context, attrs);
+    private OnClickListener mClickListen = null;
+    private OnLongClickListener mLongClickListen = null;
+    private OnExtraLongClickListener mExtraLongClickListener = null;
+    private Handler mColorHoldHandler;
+    private boolean mLongClickPerformed = false;
+    private boolean mWaitingForExtraLongClick = false;
+    private Drawable mNormalDrawable;
+    private int mPressedColor;
 
-		CLICK_HOLD_TIME = ViewUtils.getLongClickTimeout(context);
+    //used to count up holding time
+    private int mHoldInc;
+    //set up the runnable for when button is held down
+    Runnable mColorRunnable = new Runnable() {
+        private static final int NUM_COLOR_CHANGES = 10;
+        private Integer mGradStartCol, mGradEndCol, mAccentColor, mFinalColor;
 
-		mPrimaryText = "";
+        @Override
+        public void run() {
+            initializeColors();
 
-		mNormalDrawable = getBackground();
+            if (mWaitingForExtraLongClick) {
+                extraLongClickButton();
+                return;
+            }
 
-		TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.AnimatedHoldButton, 0, 0);
-		try {
-			mPrimaryText = ta.getString(R.styleable.AnimatedHoldButton_primary_text);
-			mPressedColor = ta.getColor(R.styleable.AnimatedHoldButton_pressed_color,
-					  ContextCompat.getColor(context, R.color.op_button_pressed));
-		} finally {
-			ta.recycle();
-		}
+            //after hold operation is performed and 100ms is up, set final color
+            if (mLongClickPerformed) {
+                setBackgroundColor(mFinalColor);
 
-		//this is needed for so paint knows what to measure in layoutText
-		setText(mPrimaryText);
-	}
+                //set up another delay to wait for a very long click
+                mColorHoldHandler.postDelayed(this, 2000);
+                mWaitingForExtraLongClick = true;
+                return;
+            }
 
-	@Override
-	protected void findSecondaryTextCoordinates() {
-		mSecXCord = mButtonWidth - mSecTextWidth - mSecAdditionalXOffset;
-		mSecYCord = 0 + mSecTextHeight + mSecAdditionalYOffset;
-	}
+            //color the button black for a second and perform long click operation
+            if (mHoldInc == NUM_COLOR_CHANGES) {
+                longClickButton();
+                mLongClickPerformed = true;
+                setBackgroundColor(mAccentColor);
+                //only post again so it runs to catch the final bit of code
+                mColorHoldHandler.postDelayed(this, 100);
+                return;
+            }
 
-	/**
-	 * Setup custom clicking and long clicking handlers
-	 * Click will be performed if button is pressed down and released
-	 * before the long click timeout.  As the long click timeout is
-	 * expiring, button's color will change and finally flash at the timeout
-	 * event, at which point the long click function will be called.
-	 */
-	@SuppressWarnings("deprecation") //for setBackgroundDrawable
-	public boolean onTouchEvent(MotionEvent event) {
-		switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				mHoldInc = 0;
+            mColorHoldHandler.postDelayed(this, CLICK_HOLD_TIME / NUM_COLOR_CHANGES);
 
-				if (mColorHoldHandler != null) return true;
-				mColorHoldHandler = new Handler();
-				mColorHoldHandler.postDelayed(mColorRunnable, 10);
-				break;
-			case MotionEvent.ACTION_UP:
-				if (mColorHoldHandler == null) return true;
-				if (!mLongClickPerformed)
-					clickButton();
+            float deltaRed = (float) Color.red(mGradStartCol) + ((float) Color.red(mGradEndCol) - (float) Color.red(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
+            float deltaGreen = (float) Color.green(mGradStartCol) + ((float) Color.green(mGradEndCol) - (float) Color.green(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
+            float deltaBlue = (float) Color.blue(mGradStartCol) + ((float) Color.blue(mGradEndCol) - (float) Color.blue(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
 
-				mLongClickPerformed = false;
-				mWaitingForExtraLongClick = false;
+            setBackgroundColor(Color.argb(255, (int) deltaRed, (int) deltaGreen, (int) deltaBlue));
+            mHoldInc++;
+        }
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-					setBackground(mNormalDrawable);
-				else setBackgroundDrawable(mNormalDrawable);
+        /**
+         * Helper method so colors only get initialed once
+         */
+        private void initializeColors() {
+            if (mGradStartCol == null) {
+                mGradStartCol = mPressedColor;
+                mGradEndCol = ContextCompat.getColor(getContext(),
+                        R.color.op_button_long_press_accent);
+                mAccentColor = mPressedColor;
+                mFinalColor = mPressedColor;
+            }
+        }
+    };
+    private String mPrimaryText;
 
-				mColorHoldHandler.removeCallbacks(mColorRunnable);
-				mColorHoldHandler = null;
+    public AnimatedHoldButton(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
-				postInvalidate();
-				break;
-		}
-		return true;
-	}
+        CLICK_HOLD_TIME = ViewUtils.getLongClickTimeout(context);
 
+        mPrimaryText = "";
 
-	//set up the runnable for when button is held down
-	Runnable mColorRunnable = new Runnable() {
-		private static final int NUM_COLOR_CHANGES = 10;
-		private Integer mGradStartCol, mGradEndCol, mAccentColor, mFinalColor;
+        mNormalDrawable = getBackground();
 
-		@Override
-		public void run() {
-			initializeColors();
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.AnimatedHoldButton, 0, 0);
+        try {
+            mPrimaryText = ta.getString(R.styleable.AnimatedHoldButton_primary_text);
+            mPressedColor = ta.getColor(R.styleable.AnimatedHoldButton_pressed_color,
+                    ContextCompat.getColor(context, R.color.op_button_pressed));
+        } finally {
+            ta.recycle();
+        }
 
-			if (mWaitingForExtraLongClick){
-				extraLongClickButton();
-				return;
-			}
+        //this is needed for so paint knows what to measure in layoutText
+        setText(mPrimaryText);
+    }
 
-			//after hold operation is performed and 100ms is up, set final color
-			if (mLongClickPerformed){
-				setBackgroundColor(mFinalColor);
+    @Override
+    protected void findSecondaryTextCoordinates() {
+        mSecXCord = mButtonWidth - mSecTextWidth - mSecAdditionalXOffset;
+        mSecYCord = 0 + mSecTextHeight + mSecAdditionalYOffset;
+    }
 
-				//set up another delay to wait for a very long click
-				mColorHoldHandler.postDelayed(this, 2000);
-				mWaitingForExtraLongClick = true;
-				return;
-			}
+    /**
+     * Setup custom clicking and long clicking handlers
+     * Click will be performed if button is pressed down and released
+     * before the long click timeout.  As the long click timeout is
+     * expiring, button's color will change and finally flash at the timeout
+     * event, at which point the long click function will be called.
+     */
+    @SuppressWarnings("deprecation") //for setBackgroundDrawable
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mHoldInc = 0;
 
-			//color the button black for a second and perform long click operation
-			if (mHoldInc == NUM_COLOR_CHANGES){
-				longClickButton();
-				mLongClickPerformed = true;
-				setBackgroundColor(mAccentColor);
-				//only post again so it runs to catch the final bit of code
-				mColorHoldHandler.postDelayed(this, 100);
-				return;
-			}
+                if (mColorHoldHandler != null) return true;
+                mColorHoldHandler = new Handler();
+                mColorHoldHandler.postDelayed(mColorRunnable, 10);
+                break;
+            case MotionEvent.ACTION_UP:
+                if (mColorHoldHandler == null) return true;
+                if (!mLongClickPerformed)
+                    clickButton();
 
-			mColorHoldHandler.postDelayed(this, CLICK_HOLD_TIME / NUM_COLOR_CHANGES);
+                mLongClickPerformed = false;
+                mWaitingForExtraLongClick = false;
 
-			float deltaRed = (float) Color.red(mGradStartCol) + ((float) Color.red(mGradEndCol) - (float) Color.red(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
-			float deltaGreen = (float) Color.green(mGradStartCol) + ((float) Color.green(mGradEndCol) - (float) Color.green(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
-			float deltaBlue = (float) Color.blue(mGradStartCol) + ((float) Color.blue(mGradEndCol) - (float) Color.blue(mGradStartCol)) * ((float) mHoldInc) / ((float) NUM_COLOR_CHANGES);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                    setBackground(mNormalDrawable);
+                else setBackgroundDrawable(mNormalDrawable);
 
-			setBackgroundColor(Color.argb(255, (int) deltaRed, (int) deltaGreen, (int) deltaBlue));
-			mHoldInc++;
-		}
+                mColorHoldHandler.removeCallbacks(mColorRunnable);
+                mColorHoldHandler = null;
 
-		/**
-		 * Helper method so colors only get initialed once
-		 */
-		private void initializeColors() {
-			if (mGradStartCol == null){
-				mGradStartCol = mPressedColor;
-				mGradEndCol = ContextCompat.getColor(getContext(),
-						  R.color.op_button_long_press_accent);
-				mAccentColor = mPressedColor;
-				mFinalColor = mPressedColor;
-			}
-		}
-	};
+                postInvalidate();
+                break;
+        }
+        return true;
+    }
 
-	/**
-	 * Calls listener's onClick, which gets setup by code controlling button
-	 */
-	private void clickButton() {
-		if (mClickListen != null)
-			mClickListen.onClick(this);
-	}
+    /**
+     * Calls listener's onClick, which gets setup by code controlling button
+     */
+    private void clickButton() {
+        if (mClickListen != null)
+            mClickListen.onClick(this);
+    }
 
-	/**
-	 * Calls listener's onLongClick, which gets setup by code controlling button
-	 */
-	private void longClickButton() {
-		if (mLongClickListen != null)
-			mLongClickListen.onLongClick(this);
-	}
+    /**
+     * Calls listener's onLongClick, which gets setup by code controlling button
+     */
+    private void longClickButton() {
+        if (mLongClickListen != null)
+            mLongClickListen.onLongClick(this);
+    }
 
-	private void extraLongClickButton() {
-		if (mExtraLongClickListener != null)
-			mExtraLongClickListener.onExtraLongClick(this);
-	}
+    private void extraLongClickButton() {
+        if (mExtraLongClickListener != null)
+            mExtraLongClickListener.onExtraLongClick(this);
+    }
 
-	public void setPrimaryText(CharSequence text) {
-		super.setText(text);
-		mPrimaryText = text.toString();
-	}
+    @Override
+    protected String getPrimaryText() {
+        if (mPrimaryText == null)
+            return "";
+        return mPrimaryText;
+    }
 
-	@Override
-	protected String getPrimaryText() {
-		if (mPrimaryText == null)
-			return "";
-		return mPrimaryText;
-	}
+    public void setPrimaryText(CharSequence text) {
+        super.setText(text);
+        mPrimaryText = text.toString();
+    }
 
-	@Override
-	public void setOnClickListener(OnClickListener l) {
-		mClickListen = l;
-	}
+    @Override
+    public void setOnClickListener(OnClickListener l) {
+        mClickListen = l;
+    }
 
-	@Override
-	public void setOnLongClickListener(OnLongClickListener l) {
-		mLongClickListen = l;
-	}
+    @Override
+    public void setOnLongClickListener(OnLongClickListener l) {
+        mLongClickListen = l;
+    }
 
-	public void setOnExtraLongClickListener(OnExtraLongClickListener l) {
-		mExtraLongClickListener = l;
-	}
+    public void setOnExtraLongClickListener(OnExtraLongClickListener l) {
+        mExtraLongClickListener = l;
+    }
 
-	public interface OnExtraLongClickListener {
-		void onExtraLongClick(View var1);
-	}
+    public interface OnExtraLongClickListener {
+        void onExtraLongClick(View var1);
+    }
 }
 

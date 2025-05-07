@@ -4,22 +4,22 @@ package com.llamacorp.equate.unit;
 public class UnitScalar extends Unit {
 //	private static final String JSON_INVERTED = "inverted";
 
-	//flag used to distinguish if the Unit needs to be inverted before converting
-	//eg: min/miles should be inverted to miles/min before conversion to mph
-	private boolean mInverted = false;
+    //flag used to distinguish if the Unit needs to be inverted before converting
+    //eg: min/miles should be inverted to miles/min before conversion to mph
+    private boolean mInverted = false;
 
-	public UnitScalar(String name, String longName, double value, boolean inverted) {
-		super(name, longName, value);
-		mInverted = inverted;
-	}
+    public UnitScalar(String name, String longName, double value, boolean inverted) {
+        super(name, longName, value);
+        mInverted = inverted;
+    }
 
-	public UnitScalar(String name, String longName, double value) {
-		super(name, longName, value);
-	}
+    public UnitScalar(String name, String longName, double value) {
+        super(name, longName, value);
+    }
 
-	public UnitScalar() {
-		super();
-	}
+    public UnitScalar() {
+        super();
+    }
 
 //	/** Load in the extra inverted flag */
 //	public UnitScalar(JSONObject json) throws JSONException {
@@ -35,31 +35,31 @@ public class UnitScalar extends Unit {
 //		return json;
 //	}
 
-	public boolean isInverted() {
-		return mInverted;
-	}
+    public boolean isInverted() {
+        return mInverted;
+    }
 
-	/**
-	 * Perform Unit conversion
-	 *
-	 * @param toUnit           is desired unit to convert into
-	 * @param expressionToConvert is the expression to convert
-	 * @return returns the expression string to be evaluated, will
-	 * contain something like 33*fromValue/toValue.  Will possibly
-	 * also include inversion for inverted units. For example, 33 min/mile
-	 * to mph would be 1/33*...
-	 */
-	public String convertTo(Unit toUnit, String expressionToConvert) {
-		String invertFrom = "";
-		String invertTo = "";
+    /**
+     * Perform Unit conversion
+     *
+     * @param toUnit              is desired unit to convert into
+     * @param expressionToConvert is the expression to convert
+     * @return returns the expression string to be evaluated, will
+     * contain something like 33*fromValue/toValue.  Will possibly
+     * also include inversion for inverted units. For example, 33 min/mile
+     * to mph would be 1/33*...
+     */
+    public String convertTo(Unit toUnit, String expressionToConvert) {
+        String invertFrom = "";
+        String invertTo = "";
 
-		if (isInverted())
-			invertFrom = "1/";
-		if (((UnitScalar) toUnit).isInverted()){
-			invertFrom = "1/";
-			invertTo = "1/";
-		}
-		return invertFrom + expressionToConvert + "*" + invertTo + "("
-				  + toUnit.getValue() + "/" + getValue() + ")";
-	}
+        if (isInverted())
+            invertFrom = "1/";
+        if (((UnitScalar) toUnit).isInverted()) {
+            invertFrom = "1/";
+            invertTo = "1/";
+        }
+        return invertFrom + expressionToConvert + "*" + invertTo + "("
+                + toUnit.getValue() + "/" + getValue() + ")";
+    }
 }
