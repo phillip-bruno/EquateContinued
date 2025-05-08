@@ -28,3 +28,18 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Upload Lint Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
+
+      # If you have other reports or artifacts to upload, add another step.
+      - name: Upload Problems Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: problems-report
+          path: build/reports/problems/problems-report.html
