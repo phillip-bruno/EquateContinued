@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.llamacorp.equate.view.DynamicTextView xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+    <com.wolfcola.equatecontinued.view.DynamicTextView xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
         android:id="@+id/list_item_result_convertUnitDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

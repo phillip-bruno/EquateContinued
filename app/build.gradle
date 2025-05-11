@@ -22,7 +22,7 @@ android {
     }
 
 
-    namespace 'com.llamacorp.equate'
+    namespace 'com.wolfcola.equatecontinued'
     compileSdkVersion 35
     // Option 1: Let Gradle choose the build tools version automatically by omitting buildToolsVersion
     // Option 2: Explicitly use a more recent version
@@ -31,11 +31,11 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "com.llamacorp.equate"
+        applicationId "com.wolfcola.equatecontinued"
         // If you want to restrict your app to Android 13 and above:
         minSdkVersion 35
 
-        testApplicationId "com.llamacorp.equate.test"
+        testApplicationId "com.wolfcola.equatecontinued.test"
         // Migrate to AndroidX test runner if possible:
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

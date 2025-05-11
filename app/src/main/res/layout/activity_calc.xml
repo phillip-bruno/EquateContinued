@@ -39,7 +39,7 @@
                     android:layout_height="1dp"
                     android:background="@color/prev_curr_exp_divider" />
 
-                <com.llamacorp.equate.view.DynamicTextView xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+                <com.wolfcola.equatecontinued.view.DynamicTextView xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                     android:id="@+id/resultPreview"
                     style="@style/ResultPreview"
                     android:layout_width="match_parent"
@@ -53,7 +53,7 @@
                     android:paddingLeft="@dimen/ResultPrevPadding"
                     android:paddingRight="@dimen/ResultPrevPadding"
                     android:scrollHorizontally="true"
-                    customNS:minimumTextSize="15sp"></com.llamacorp.equate.view.DynamicTextView>
+                    customNS:minimumTextSize="15sp"></com.wolfcola.equatecontinued.view.DynamicTextView>
             </LinearLayout>
 
             <View
@@ -62,7 +62,7 @@
                 android:layout_height="2dp"
                 android:background="@color/prev_curr_exp_divider" />
 
-            <com.llamacorp.equate.view.EditTextDisplay xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.EditTextDisplay xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/textDisplay"
                 android:layout_width="match_parent"
                 android:layout_height="54sp"
@@ -117,14 +117,14 @@
                 style="@style/CalcButton.Clear"
                 android:text="@string/clear_button" />
 
-            <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/percent_button"
                 style="@style/CalcButton.Operator"
                 customNS:primary_text="@string/percent_button"
                 customNS:secondary_text="@string/ee_button"
                 customNS:secondary_text_font_size_percentage="50" />
 
-            <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/divide_button"
                 style="@style/CalcButton.Operator"
                 customNS:primary_text="@string/divide_button"
@@ -159,7 +159,7 @@
                 style="@style/CalcButton.Numb"
                 android:text="@string/nine_button" />
 
-            <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/multiply_button"
                 style="@style/CalcButton.Operator"
                 customNS:primary_text="@string/multiply_button"
@@ -187,7 +187,7 @@
                 style="@style/CalcButton.Numb"
                 android:text="@string/six_button" />
 
-            <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/minus_button"
                 style="@style/CalcButton.Operator"
                 customNS:primary_text="@string/minus_button"
@@ -244,7 +244,7 @@
                 android:layout_weight="1"
                 android:background="@color/app_background">
 
-                <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+                <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                     android:id="@+id/open_para_button"
                     style="@style/SmallOperator"
                     android:layout_marginRight="@dimen/CalcButtonMargin"
@@ -253,7 +253,7 @@
                     customNS:secondary_text_font_size_percentage="45" />
 
 
-                <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+                <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                     android:id="@+id/close_para_button"
                     style="@style/SmallOperator"
                     android:layout_marginLeft="@dimen/CalcButtonMargin"
@@ -263,7 +263,7 @@
 
             </LinearLayout>
 
-            <com.llamacorp.equate.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.llamacorp.equate"
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
                 android:id="@+id/equals_button"
                 style="@style/CalcButton.Equals"
                 customNS:pressed_color="@color/equal_button_pressed"

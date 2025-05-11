@@ -31,7 +31,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 
-import com.llamacorp.equate.R;
+import com.wolfcola.equatecontinued.R;
 
 /**
  * This widget implements the dynamic action bar tab behavior that can change
@@ -242,7 +242,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         void onTabReselected(int position);
     }
 
-    private class TabView extends TextView {
+    private class TabView extends androidx.appcompat.widget.AppCompatTextView {
         private int mIndex;
 
         public TabView(Context context) {
