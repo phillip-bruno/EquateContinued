@@ -33,6 +33,16 @@ android {
     // Option 2: Explicitly use a more recent version
     buildToolsVersion "35.0.0"
 
+    signingConfigs {
+        release {
+            def ksFile = System.getenv("KEYSTORE_FILE") ?: "${rootProject.projectDir}/release-key.jks"
+            storeFile file(ksFile)
+            storePassword System.getenv("KEYSTORE_PASSWORD") ?: ""
+            keyAlias System.getenv("KEY_ALIAS") ?: "equate"
+            keyPassword System.getenv("KEY_PASSWORD") ?: ""
+        }
+    }
+
     defaultConfig {
         applicationId "com.wolfcola.equatecontinued"
         minSdkVersion 26
@@ -46,6 +56,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             shrinkResources false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),

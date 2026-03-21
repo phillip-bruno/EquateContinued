@@ -52,6 +52,10 @@ Icon/
 *.xls
 *.xlsx
 
+# Signing keystores
+*.jks
+*.keystore
+
 # SSH keys
 personal
 personal.pub
