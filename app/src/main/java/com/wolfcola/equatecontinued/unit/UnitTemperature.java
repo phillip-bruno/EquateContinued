@@ -31,7 +31,7 @@ public class UnitTemperature extends Unit {
         if (toUnit.getValue() == CELSIUS)
             return expressionToConvert;
         else if (toUnit.getValue() == FAHRENHEIT)
-            return "(" + expressionToConvert + "*9/5+32";
+            return "(" + expressionToConvert + "*9/5)+32";
         else if (toUnit.getValue() == KELVIN)
             return expressionToConvert + "+273.15";
         else

@@ -210,7 +210,8 @@ public class Solver {
             } else if (operator.equals("*"))
                 result = operand1.multiply(operand2, mMcOperate);
             else if (operator.equals("^")) {
-                //this is a temp hack, will most likely want to use a custom bigdecimal function to perform more accurate/bigger conversions
+                // TODO: Math.pow() converts to double, losing precision for large exponents (e.g. 2^53+).
+                // A proper fix would use an arbitrary-precision BigDecimal power implementation.
                 double dResult = Math.pow(operand1.doubleValue(), operand2.doubleValue());
                 //catch infinity errors could be neg or pos
                 try {

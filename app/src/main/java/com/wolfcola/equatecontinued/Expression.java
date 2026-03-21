@@ -926,7 +926,7 @@ public class Expression {
      */
     private void insertAt(String toAdd, int insertLocation) {
         //return if we're trying to insert at invalid location
-        if (insertLocation > length() | insertLocation < 0)
+        if (insertLocation > length() || insertLocation < 0)
             return;
         //actually insert text into the expression
         setExpression(getExpression().substring(0, insertLocation) + toAdd
