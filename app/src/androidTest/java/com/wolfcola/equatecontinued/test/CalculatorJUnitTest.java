@@ -91,6 +91,7 @@ public class CalculatorJUnitTest {
         // Your test code here
     }
 
+    @Test
     public void testParseKeyPressed() {
         Calculator calc = getTestCalc();
         //try all ops before (should do nothing), try double decimal, try changing op, and extra equals
@@ -159,6 +160,7 @@ public class CalculatorJUnitTest {
         assertEquals("30.03", calc.toString());
     }
 
+    @Test
     public void testNumberAccuracy() {
         Calculator calc = getTestCalc();
         loadStringToCalc("4", calc);
@@ -178,6 +180,7 @@ public class CalculatorJUnitTest {
         assertTrue(calc.toString().matches(".*E20$"));
     }
 
+    @Test
     public void testErrors() {
         Calculator calc = getTestCalc();
         //divide by zero error
@@ -192,6 +195,7 @@ public class CalculatorJUnitTest {
         loadStringToCalc("9E9999999999=", calc);
     }
 
+    @Test
     public void testCleaning() {
         Calculator calc = getTestCalc();
         //make sure we're cleaning properly
@@ -207,6 +211,7 @@ public class CalculatorJUnitTest {
         assertEquals("0.0808", calc.toString());
     }
 
+    @Test
     public void testExponents() {
         Calculator calc = getTestCalc();
         //first try to break it
@@ -270,6 +275,7 @@ public class CalculatorJUnitTest {
         assertEquals("8000000000000000000000000", calc.toString());
     }
 
+    @Test
     public void testPower() {
         Calculator calc = getTestCalc();
         //test basic functionality
@@ -322,6 +328,7 @@ public class CalculatorJUnitTest {
 
     }
 
+    @Test
     public void testSelection() {
         Calculator calc = getTestCalc();
 
@@ -406,6 +413,7 @@ public class CalculatorJUnitTest {
 //		assertEquals(Solver.strSyntaxError, calc.toString());
 //	}
 
+    @Test
     public void testNegateOperator() {
         Calculator calc = getTestCalc();
 
@@ -434,6 +442,7 @@ public class CalculatorJUnitTest {
         assertEquals("45", calc.toString());
     }
 
+    @Test
     public void testInvertOperator() {
         Calculator calc = getTestCalc();
 
@@ -463,6 +472,7 @@ public class CalculatorJUnitTest {
 
     }
 
+    @Test
     public void testPara() {
         Calculator calc = getTestCalc();
 
@@ -513,6 +523,7 @@ public class CalculatorJUnitTest {
         assertEquals("3024", calc.toString());
     }
 
+    @Test
     public void testPercent() {
         Calculator calc = getTestCalc();
 
@@ -587,7 +598,7 @@ public class CalculatorJUnitTest {
         }
     }
 
-    //run the brute force test
+    @Test
     public void testBrute() {
         bruteCalc = getTestCalc();
         int numRuns = 4;
