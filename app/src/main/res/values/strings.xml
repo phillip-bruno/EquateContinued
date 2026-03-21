@@ -20,6 +20,16 @@
     <string name="open_para_long_button">&#8230;)</string>
     <string name="close_para_long_button">(&#8230;</string>
 
+    <!-- Accessibility content descriptions -->
+    <string name="desc_backspace">Backspace</string>
+    <string name="desc_expression_display">Calculator expression</string>
+    <string name="desc_result_preview">Result preview</string>
+    <string name="desc_result_history">Result history</string>
+    <string name="desc_unit_pager">Unit conversion selector</string>
+    <string name="desc_unit_type_tabs">Unit type tabs</string>
+    <string name="desc_navigation_drawer">Navigation menu</string>
+    <string name="desc_app_logo">Equate Continued logo</string>
+
 
     <string name="zero_button">0</string>
     <string name="one_button">1</string>
@@ -87,8 +97,8 @@
     <string name="about">About</string>
     <string name="find_unit">Find Unit</string>
     <string name="find_unit_hint">Find unit:</string>
-    <string name="whats_new">What is new in v2.1</string>
-    <string name="version_description">—  Support for Android 15</string>
+    <string name="whats_new">What is new in v2.1.1</string>
+    <string name="version_description">—  Under the hood changes.</string>
 
 
     <color name="equal_button_normal">#176B17</color>
