@@ -151,7 +151,7 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
                     highList = mSepHandler.translateIndexListToSep(highList);
                     int color = (Integer) animator.getAnimatedValue();
                     int len = highList.size();
-                    coloredExp = new StringBuilder(mExpressionText.substring(0, highList.getFirst()));
+                    coloredExp = new StringBuilder(mExpressionText.substring(0, highList.get(0)));
                     for (int i = 0; i < len; i++) {
                         int finish = mExpressionText.length();
                         if (i != len - 1) finish = highList.get(i + 1);
