@@ -51,3 +51,9 @@ Icon/
 #Excel Files
 *.xls
 *.xlsx
+
+# SSH keys
+personal
+personal.pub
+*.pem
+id_*

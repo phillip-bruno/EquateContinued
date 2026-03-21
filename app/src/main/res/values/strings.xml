@@ -30,6 +30,10 @@
     <string name="desc_navigation_drawer">Navigation menu</string>
     <string name="desc_app_logo">Equate Continued logo</string>
 
+    <!-- Toast messages -->
+    <string name="toast_cut">Cut: \"%s\"</string>
+    <string name="toast_pasted">Pasted: \"%s\"</string>
+
 
     <string name="zero_button">0</string>
     <string name="one_button">1</string>
@@ -148,6 +152,9 @@
 
     <color name="preview_text_color">#B23535</color>
     <color name="preview_si_suffix_text_color">#B23535</color>
+
+    <color name="highlight_from">#FFFF0000</color>
+    <color name="highlight_to">#FFFFFFFF</color>
 
 
     <color name="app_background">#000000</color>

@@ -13,10 +13,6 @@ public class UnitTemperature extends Unit {
         super("", "", 0);
     }
 
-//	public UnitTemperature(JSONObject json) throws JSONException {
-//		super(json);
-//	}
-
     @Override
     public String convertTo(Unit toUnit, String expressionToConvert) {
         //converting from Fahrenheit, always go to Celsius

@@ -187,13 +187,6 @@ public class CalcActivity extends AppCompatActivity
 
         });
 
-//		mDisplay.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-//			@Override
-//			public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-//				Log.d("DBG", "in on create context menu");
-//			}
-//		});
-
         //use fragment manager to make the result list
         FragmentManager fm = getSupportFragmentManager();
         mResultListFrag = (ResultListFragment) fm.findFragmentById(R.id.resultListFragmentContainer);
@@ -216,23 +209,6 @@ public class CalcActivity extends AppCompatActivity
                 ((AnimatedHoldButton) button)
                         .setSecondaryText(mCalc.mPreferences.getPercentButSec());
             }
-
-//
-//			button.setOnTouchListener(new View.OnTouchListener() {
-//				@Override
-//				public boolean onTouch(View view, MotionEvent motionEvent) {
-//					if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN){
-//						mTimer = System.currentTimeMillis();
-//						Log.d("buttonTimer", "Time pressed = " +
-//								  String.valueOf(System.currentTimeMillis() - mTimer));
-//					}
-//					if (motionEvent.getActionMasked() == MotionEvent.ACTION_UP){
-//						Log.d("buttonTimer", "Time pressed = " +
-//								  String.valueOf(System.currentTimeMillis() - mTimer));
-//					}
-//					return false;
-//				}
-//			});
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -599,6 +575,7 @@ public class CalcActivity extends AppCompatActivity
             PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
             currentVersionNumber = pi.versionCode;
         } catch (Exception e) {
+            android.util.Log.e("CalcActivity", "Failed to get version info", e);
         }
 
         if (currentVersionNumber > savedVersionNumber) {
@@ -832,7 +809,7 @@ public class CalcActivity extends AppCompatActivity
         try {
             Calculator.getCalculator(this).saveState();
         } catch (Exception e) {
-            e.printStackTrace();
+            android.util.Log.e("CalcActivity", "Failed to save calculator state", e);
         }
     }
 

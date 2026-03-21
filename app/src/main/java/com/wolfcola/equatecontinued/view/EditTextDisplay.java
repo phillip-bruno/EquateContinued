@@ -15,6 +15,7 @@ import android.text.InputType;
 import android.util.AttributeSet;
 import android.widget.Toast;
 
+import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.ExpSeparatorHandler;
 import com.wolfcola.equatecontinued.Expression;
@@ -136,8 +137,8 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
      */
     public void setupHighlighting() {
         if (mCalc.isHighlighted()) {
-            Integer colorFrom = Color.RED;
-            Integer colorTo = Color.WHITE;
+            Integer colorFrom = androidx.core.content.ContextCompat.getColor(getContext(), R.color.highlight_from);
+            Integer colorTo = androidx.core.content.ContextCompat.getColor(getContext(), R.color.highlight_to);
             final int ANIMATE_DURR = 600; //ms
             mColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
             mColorAnimation.addUpdateListener(animator -> {
@@ -297,7 +298,7 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
         //this was in the original function, keep for now
         LAST_CUT_OR_COPY_TIME = SystemClock.uptimeMillis();
 
-        Toast.makeText(mContext, "Cut: \"" + copiedText + "\"", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.toast_cut, copiedText), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -309,7 +310,7 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
         ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboard.getPrimaryClip();
         textToPaste = Objects.requireNonNull(clip).getItemAt(0).coerceToText(getContext()).toString();
-        Toast.makeText(mContext, "Pasted: \"" + textToPaste + "\"", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.toast_pasted, textToPaste), Toast.LENGTH_SHORT).show();
         mCalc.pasteIntoExpression(textToPaste);
     }
 
