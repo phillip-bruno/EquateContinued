@@ -33,11 +33,10 @@ android {
     // Option 2: Explicitly use a more recent version
     buildToolsVersion "35.0.0"
 
-    useLibrary 'org.apache.http.legacy'
-
     defaultConfig {
         applicationId "com.wolfcola.equatecontinued"
         minSdkVersion 26
+        targetSdkVersion 35
 
         testApplicationId "com.wolfcola.equatecontinued.test"
         // Migrate to AndroidX test runner if possible:
