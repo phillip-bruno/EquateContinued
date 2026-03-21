@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night mode colors: preserve the existing dark calculator theme -->
+    <color name="app_background">#000000</color>
+    <color name="num_button_normal">#191919</color>
+    <color name="op_button_normal">#282828</color>
+    <color name="button_text_normal">#D4D4D4</color>
+    <color name="button_text_pressed">#232323</color>
+    <color name="result_text">#FFFFFF</color>
+    <color name="prev_result_text">#808080</color>
+    <color name="prev_curr_exp_divider">#252525</color>
+    <color name="color_search_name_text">#FFFFFF</color>
+</resources>
