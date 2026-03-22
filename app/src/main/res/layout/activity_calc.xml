@@ -1,17 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background"
-    android:gravity="bottom"
-    android:orientation="vertical">
+    android:background="@color/app_background">
 
+    <!-- Top section: display area + unit container -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/top_section"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:background="@color/app_background"
-        android:gravity="bottom"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/button_row_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintVertical_weight="5">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +45,7 @@
                     android:layout_height="1dp"
                     android:background="@color/prev_curr_exp_divider" />
 
-                <com.wolfcola.equatecontinued.view.DynamicTextView xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
+                <com.wolfcola.equatecontinued.view.DynamicTextView
                     android:id="@+id/resultPreview"
                     style="@style/ResultPreview"
                     android:layout_width="match_parent"
@@ -49,12 +55,12 @@
                     android:layout_marginLeft="@dimen/ResultPaddingLeft"
                     android:layout_marginEnd="@dimen/ResultPadding"
                     android:layout_marginRight="@dimen/ResultPadding"
+                    android:contentDescription="@string/desc_result_preview"
                     android:gravity="end"
                     android:paddingLeft="@dimen/ResultPrevPadding"
                     android:paddingRight="@dimen/ResultPrevPadding"
                     android:scrollHorizontally="true"
-                    customNS:minimumTextSize="15sp"
-                    android:contentDescription="@string/desc_result_preview"></com.wolfcola.equatecontinued.view.DynamicTextView>
+                    customNS:minimumTextSize="15sp" />
             </LinearLayout>
 
             <View
@@ -63,7 +69,7 @@
                 android:layout_height="2dp"
                 android:background="@color/prev_curr_exp_divider" />
 
-            <com.wolfcola.equatecontinued.view.EditTextDisplay xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
+            <com.wolfcola.equatecontinued.view.EditTextDisplay
                 android:id="@+id/textDisplay"
                 android:layout_width="match_parent"
                 android:layout_height="54sp"
@@ -72,11 +78,11 @@
                 android:layout_marginEnd="@dimen/ResultPadding"
                 android:layout_marginRight="@dimen/ResultPadding"
                 android:background="@color/app_background"
+                android:contentDescription="@string/desc_expression_display"
                 android:gravity="end|bottom"
                 android:inputType="textNoSuggestions"
                 android:textSize="40sp"
-                customNS:minimumTextSize="25sp"
-                android:contentDescription="@string/desc_expression_display" />
+                customNS:minimumTextSize="25sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -88,193 +94,216 @@
             android:gravity="bottom"
             android:orientation="vertical">
 
-            <com.viewpagerindicator.TabPageIndicator
+            <com.google.android.material.tabs.TabLayout
                 android:id="@+id/unit_type_titles"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabTextAppearance="@style/TextAppearance.UnitTab" />
 
-            <androidx.viewpager.widget.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+            <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/unit_pager"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/desc_unit_pager" />
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Button row 1: C, %, ÷, ⌫ -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/button_row_1"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:background="@color/app_background"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toTopOf="@id/button_row_2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_section"
+        app:layout_constraintVertical_weight="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/app_background">
+        <Button
+            android:id="@+id/clear_button"
+            style="@style/CalcButton.Clear"
+            android:text="@string/clear_button" />
 
-            <Button
-                android:id="@+id/clear_button"
-                style="@style/CalcButton.Clear"
-                android:text="@string/clear_button" />
+        <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+            android:id="@+id/percent_button"
+            style="@style/CalcButton.Operator"
+            customNS:primary_text="@string/percent_button"
+            customNS:secondary_text="@string/ee_button"
+            customNS:secondary_text_font_size_percentage="50" />
 
-            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                android:id="@+id/percent_button"
-                style="@style/CalcButton.Operator"
-                customNS:primary_text="@string/percent_button"
-                customNS:secondary_text="@string/ee_button"
-                customNS:secondary_text_font_size_percentage="50" />
+        <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+            android:id="@+id/divide_button"
+            style="@style/CalcButton.Operator"
+            customNS:primary_text="@string/divide_button"
+            customNS:secondary_text="@string/invert_button"
+            customNS:secondary_text_font_size_percentage="50" />
 
-            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                android:id="@+id/divide_button"
-                style="@style/CalcButton.Operator"
-                customNS:primary_text="@string/divide_button"
-                customNS:secondary_text="@string/invert_button"
-                customNS:secondary_text_font_size_percentage="50" />
-
-            <ImageButton
-                android:id="@+id/backspace_button"
-                style="@style/CalcButton.Operator"
-                android:adjustViewBounds="false"
-                android:src="@drawable/ic_action_backspace"
-                android:contentDescription="@string/desc_backspace" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/app_background">
-
-            <Button
-                android:id="@+id/seven_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/seven_button" />
-
-            <Button
-                android:id="@+id/eight_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/eight_button" />
-
-            <Button
-                android:id="@+id/nine_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/nine_button" />
-
-            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                android:id="@+id/multiply_button"
-                style="@style/CalcButton.Operator"
-                customNS:primary_text="@string/multiply_button"
-                customNS:secondary_text="@string/power_button" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/app_background">
-
-            <Button
-                android:id="@+id/four_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/four_button" />
-
-            <Button
-                android:id="@+id/five_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/five_button" />
-
-            <Button
-                android:id="@+id/six_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/six_button" />
-
-            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                android:id="@+id/minus_button"
-                style="@style/CalcButton.Operator"
-                customNS:primary_text="@string/minus_button"
-                customNS:secondary_text="@string/negate_button" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/app_background">
-
-            <Button
-                android:id="@+id/one_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/one_button" />
-
-            <Button
-                android:id="@+id/two_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/two_button" />
-
-            <Button
-                android:id="@+id/three_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/three_button" />
-
-            <Button
-                android:id="@+id/plus_button"
-                style="@style/CalcButton.Operator"
-                android:text="@string/plus_button" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@color/app_background">
-
-            <Button
-                android:id="@+id/zero_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/zero_button" />
-
-            <Button
-                android:id="@+id/decimal_button"
-                style="@style/CalcButton.Numb"
-                android:text="@string/decimal_button" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/CalcButtonMargin"
-                android:layout_weight="1"
-                android:background="@color/app_background">
-
-                <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                    android:id="@+id/open_para_button"
-                    style="@style/SmallOperator"
-                    android:layout_marginRight="@dimen/CalcButtonMargin"
-                    customNS:primary_text="@string/open_para_button"
-                    customNS:secondary_text="@string/open_para_long_button"
-                    customNS:secondary_text_font_size_percentage="45" />
-
-
-                <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                    android:id="@+id/close_para_button"
-                    style="@style/SmallOperator"
-                    android:layout_marginLeft="@dimen/CalcButtonMargin"
-                    customNS:primary_text="@string/close_para_button"
-                    customNS:secondary_text="@string/close_para_long_button"
-                    customNS:secondary_text_font_size_percentage="45" />
-
-            </LinearLayout>
-
-            <com.wolfcola.equatecontinued.view.AnimatedHoldButton xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
-                android:id="@+id/equals_button"
-                style="@style/CalcButton.Equals"
-                customNS:pressed_color="@color/equal_button_pressed"
-                customNS:primary_text="@string/equals_button"
-                customNS:secondary_text="@string/equals_secondary_text"
-                customNS:secondary_text_color="@color/equals_secondary_text_color_normal" />
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/backspace_button"
+            style="@style/CalcButton.Operator"
+            android:adjustViewBounds="false"
+            android:contentDescription="@string/desc_backspace"
+            android:src="@drawable/ic_action_backspace" />
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Button row 2: 7, 8, 9, × -->
+    <LinearLayout
+        android:id="@+id/button_row_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/app_background"
+        app:layout_constraintBottom_toTopOf="@id/button_row_3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_row_1"
+        app:layout_constraintVertical_weight="1">
+
+        <Button
+            android:id="@+id/seven_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/seven_button" />
+
+        <Button
+            android:id="@+id/eight_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/eight_button" />
+
+        <Button
+            android:id="@+id/nine_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/nine_button" />
+
+        <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+            android:id="@+id/multiply_button"
+            style="@style/CalcButton.Operator"
+            customNS:primary_text="@string/multiply_button"
+            customNS:secondary_text="@string/power_button" />
+    </LinearLayout>
+
+    <!-- Button row 3: 4, 5, 6, - -->
+    <LinearLayout
+        android:id="@+id/button_row_3"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/app_background"
+        app:layout_constraintBottom_toTopOf="@id/button_row_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_row_2"
+        app:layout_constraintVertical_weight="1">
+
+        <Button
+            android:id="@+id/four_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/four_button" />
+
+        <Button
+            android:id="@+id/five_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/five_button" />
+
+        <Button
+            android:id="@+id/six_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/six_button" />
+
+        <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+            android:id="@+id/minus_button"
+            style="@style/CalcButton.Operator"
+            customNS:primary_text="@string/minus_button"
+            customNS:secondary_text="@string/negate_button" />
+    </LinearLayout>
+
+    <!-- Button row 4: 1, 2, 3, + -->
+    <LinearLayout
+        android:id="@+id/button_row_4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/app_background"
+        app:layout_constraintBottom_toTopOf="@id/button_row_5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_row_3"
+        app:layout_constraintVertical_weight="1">
+
+        <Button
+            android:id="@+id/one_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/one_button" />
+
+        <Button
+            android:id="@+id/two_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/two_button" />
+
+        <Button
+            android:id="@+id/three_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/three_button" />
+
+        <Button
+            android:id="@+id/plus_button"
+            style="@style/CalcButton.Operator"
+            android:text="@string/plus_button" />
+    </LinearLayout>
+
+    <!-- Button row 5: 0, ., (), = -->
+    <LinearLayout
+        android:id="@+id/button_row_5"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/app_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_row_4"
+        app:layout_constraintVertical_weight="1">
+
+        <Button
+            android:id="@+id/zero_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/zero_button" />
+
+        <Button
+            android:id="@+id/decimal_button"
+            style="@style/CalcButton.Numb"
+            android:text="@string/decimal_button" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/CalcButtonMargin"
+            android:layout_weight="1"
+            android:background="@color/app_background">
+
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+                android:id="@+id/open_para_button"
+                style="@style/SmallOperator"
+                android:layout_marginRight="@dimen/CalcButtonMargin"
+                customNS:primary_text="@string/open_para_button"
+                customNS:secondary_text="@string/open_para_long_button"
+                customNS:secondary_text_font_size_percentage="45" />
+
+            <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+                android:id="@+id/close_para_button"
+                style="@style/SmallOperator"
+                android:layout_marginLeft="@dimen/CalcButtonMargin"
+                customNS:primary_text="@string/close_para_button"
+                customNS:secondary_text="@string/close_para_long_button"
+                customNS:secondary_text_font_size_percentage="45" />
+        </LinearLayout>
+
+        <com.wolfcola.equatecontinued.view.AnimatedHoldButton
+            android:id="@+id/equals_button"
+            style="@style/CalcButton.Equals"
+            customNS:pressed_color="@color/equal_button_pressed"
+            customNS:primary_text="@string/equals_button"
+            customNS:secondary_text="@string/equals_secondary_text"
+            customNS:secondary_text_color="@color/equals_secondary_text_color_normal" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

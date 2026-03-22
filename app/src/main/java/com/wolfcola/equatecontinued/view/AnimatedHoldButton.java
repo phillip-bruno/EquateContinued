@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -128,7 +127,6 @@ public class AnimatedHoldButton extends SecondaryTextButton {
      * expiring, button's color will change and finally flash at the timeout
      * event, at which point the long click function will be called.
      */
-    @SuppressWarnings("deprecation") //for setBackgroundDrawable
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -146,9 +144,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
                 mLongClickPerformed = false;
                 mWaitingForExtraLongClick = false;
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-                    setBackground(mNormalDrawable);
-                else setBackgroundDrawable(mNormalDrawable);
+                setBackground(mNormalDrawable);
 
                 mColorHoldHandler.removeCallbacks(mColorRunnable);
                 mColorHoldHandler = null;

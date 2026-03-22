@@ -2,7 +2,6 @@ package com.wolfcola.equatecontinued.view;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.DataSetObserver;
 import android.text.Editable;
 import android.text.InputType;
@@ -25,7 +24,6 @@ import com.wolfcola.equatecontinued.view.IdlingResource.SimpleIdlingResource;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 
 /**
@@ -93,12 +91,7 @@ public class UnitSearchDialogBuilder {
             items.add(new UnitSearchItem(unitTypeKey, unit.getLongName(),
                     unit.getAbbreviation(), i));
         }
-        Collections.sort(items, new Comparator<UnitSearchItem>() {
-            @Override
-            public int compare(UnitSearchItem o1, UnitSearchItem o2) {
-                return o1.getUnitName().compareTo(o2.getUnitName());
-            }
-        });
+        Collections.sort(items, (o1, o2) -> o1.getUnitName().compareTo(o2.getUnitName()));
     }
 
     /**
@@ -163,12 +156,7 @@ public class UnitSearchDialogBuilder {
             }
         });
 
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("cancel", (dialog, which) -> dialog.dismiss());
 
         mAlertDialog = builder.create();
 

@@ -70,4 +70,9 @@
         </item>
         <item name="android:textSize">30sp</item>
     </style>
+
+    <style name="TextAppearance.UnitTab" parent="TextAppearance.MaterialComponents.Tab">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

@@ -4,44 +4,28 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.SystemClock;
 import android.text.InputType;
 import android.util.AttributeSet;
-import android.widget.Toast;
 
-import com.wolfcola.equatecontinued.R;
+import androidx.core.content.ContextCompat;
+
 import com.wolfcola.equatecontinued.Calculator;
-import com.wolfcola.equatecontinued.ExpSeparatorHandler;
-import com.wolfcola.equatecontinued.Expression;
 import com.wolfcola.equatecontinued.R;
-import com.wolfcola.equatecontinued.SISuffixHelper;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 
 public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText {
-    //TODO might not need this
-    // (This was in the original TextView) System wide time for last cut or copy action.
-    static long LAST_CUT_OR_COPY_TIME;
     private Calculator mCalc;
-    private Context mContext;
     private float mTextSize = 0f;
     private float mMinTextSize;
     private int mSelStart = 0;
     private int mSelEnd = 0;
-    private String mTextPrefix = "";
-    private String mExpressionText = "";
-    private String mTextSuffix = "";
-    private ExpSeparatorHandler mSepHandler;
+    private final DisplayFormatter mFormatter = new DisplayFormatter();
     private ValueAnimator mColorAnimation;
-
 
     public EditTextDisplay(Context context) {
         this(context, null);
@@ -58,10 +42,6 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
     }
 
     private void setUpEditText(Context context, AttributeSet attrs) {
-        mContext = context;
-        mSepHandler = new ExpSeparatorHandler();
-
-        //grab custom resource variable
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DynamicText, 0, 0);
         try {
             mMinTextSize = ta.getDimension(R.styleable.DynamicText_minimumTextSize,
@@ -78,7 +58,6 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
         mCalc = calc;
     }
 
-
     /**
      * Disable soft keyboard from appearing, use in conjunction with
      * android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"
@@ -92,78 +71,54 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
      * Updates the text and selection with current value from calc
      */
     public void updateTextFromCalc() {
-        mTextPrefix = "";
-        mExpressionText = getSepDispText();
-        mTextSuffix = "";
+        int[] sel = mFormatter.format(mCalc, getResources());
+        mSelStart = sel[0];
+        mSelEnd = sel[1];
 
-        //setText will reset selection to 0,0, so save it right now
-        mSelStart = mSepHandler.translateToSepIndex(mCalc.getSelectionStart());
-        mSelEnd = mSepHandler.translateToSepIndex(mCalc.getSelectionEnd());
+        setText(mFormatter.toDisplayText());
 
-        //if expression not invalid and unit selected, display it after the expression
-        if (!mCalc.isExpressionInvalid() && mCalc.isUnitSelected()) {
-            mTextSuffix = " " + mCalc.getCurrUnitType().getCurrUnit().toString();
-            //about to do conversion
-            if (!mCalc.isSolved()) {
-                mTextPrefix = getResources().getString(R.string.word_Convert) + " ";
-                mTextSuffix = mTextSuffix + " " + getResources().getString(R.string.word_to) + ":";
-
-                //bump cursor position to the right by prefix text length
-                mSelStart = mSelStart + mTextPrefix.length();
-                mSelEnd = mSelEnd + mTextPrefix.length();
-            }
-        }
-
-        if (mCalc.isSolved() &&
-                mCalc.getNumberFormat() == Expression.NumFormat.ENGINEERING) {
-            mTextSuffix = " " + SISuffixHelper.getSuffixName(mExpressionText);
-        }
-        //update the main display
-        setTextHtml(mExpressionText);
-
-        //Set up a animator to highlight parts red and fade to white
         setupHighlighting();
 
-        //updating the text restarts selection to 0,0, so load in the current selection
         setSelection(mSelStart, mSelEnd);
 
-        //if expression not solved, set cursor to visible (and visa-versa)
         setCursorVisible(!mCalc.isSolved());
     }
-
 
     /**
      * Helper method to setup the highlighting
      */
     public void setupHighlighting() {
         if (mCalc.isHighlighted()) {
-            Integer colorFrom = androidx.core.content.ContextCompat.getColor(getContext(), R.color.highlight_from);
-            Integer colorTo = androidx.core.content.ContextCompat.getColor(getContext(), R.color.highlight_to);
+            int colorFrom = ContextCompat.getColor(getContext(), R.color.highlight_from);
+            int colorTo = ContextCompat.getColor(getContext(), R.color.highlight_to);
             final int ANIMATE_DURR = 600; //ms
             mColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
             mColorAnimation.addUpdateListener(animator -> {
-                StringBuilder coloredExp;
+                String expText;
                 //if the highlight got canceled during the async animation update, cancel
                 if (!mCalc.isHighlighted()) {
                     animator.cancel();
-                    coloredExp = Optional.ofNullable(mExpressionText).map(StringBuilder::new).orElse(null);
+                    expText = mFormatter.getExpression();
                 } else {
                     ArrayList<Integer> highList = mCalc.getHighlighted();
-                    highList = mSepHandler.translateIndexListToSep(highList);
+                    highList = mFormatter.getSepHandler().translateIndexListToSep(highList);
                     int color = (Integer) animator.getAnimatedValue();
+                    String expression = mFormatter.getExpression();
                     int len = highList.size();
-                    coloredExp = new StringBuilder(mExpressionText.substring(0, highList.get(0)));
+                    StringBuilder coloredExp = new StringBuilder(expression.substring(0, highList.get(0)));
                     for (int i = 0; i < len; i++) {
-                        int finish = mExpressionText.length();
+                        int finish = expression.length();
                         if (i != len - 1) finish = highList.get(i + 1);
-                        coloredExp.append("<font color='").append(color).append("'>").append(mExpressionText.charAt(highList.get(i))).append("</font>").append(mExpressionText.substring(highList.get(i) + 1, finish));
+                        coloredExp.append("<font color='").append(color).append("'>")
+                                .append(expression.charAt(highList.get(i)))
+                                .append("</font>")
+                                .append(expression.substring(highList.get(i) + 1, finish));
                     }
+                    expText = coloredExp.toString();
                 }
 
-                //update the main display
-                setTextHtml(coloredExp == null ? null : coloredExp.toString());
+                setText(mFormatter.toDisplayText(expText));
 
-                //updating the text restarts selection to 0,0, so load in the current selection
                 setSelection(mSelStart, mSelEnd);
             });
             mColorAnimation.addListener(new AnimatorListenerAdapter() {
@@ -183,44 +138,18 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
 
         //only need to change the text if we have a animator running
         if (mColorAnimation != null && mColorAnimation.isRunning()) {
-            //update the main display
-            setTextHtml(mExpressionText);
+            setText(mFormatter.toDisplayText());
 
-            //updating the text restarts selection to 0,0, so load in the current selection
             setSelection(mSelStart, mSelEnd);
         }
     }
 
     /**
-     * Helper method used to set the main display with HTML formatting, without
-     * highlighting
-     *
-     * @param expStr is the main expression to update
-     */
-    private void setTextHtml(String expStr) {
-        setText(ViewUtils.fromHtml("<font color='gray'>" + mTextPrefix + "</font>" +
-                expStr +
-                "<font color='gray'>" + mTextSuffix + "</font>"));
-    }
-
-
-    /**
      * Sets the current selection to the end of the expression
      */
     public void setSelectionToEnd() {
-        int expLen = mExpressionText.length() + mTextPrefix.length();
+        int expLen = mFormatter.getExpression().length() + mFormatter.getPrefix().length();
         setSelection(expLen, expLen);
-    }
-
-
-    /**
-     * Helper method returns the Expression text from calc seperated by commas
-     * This function will also set up update mSepHandler such that getting
-     * shiftedIndexs will work with the current text.
-     */
-    private String getSepDispText() {
-        //return mCalc.toString();
-        return mSepHandler.getSepText(mCalc.toString());
     }
 
 
@@ -267,10 +196,13 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
 
         switch (id) {
             case android.R.id.cut:
-                onTextCut();
+                ClipboardHelper.cut(getContext(),
+                        Objects.requireNonNull(getText()).subSequence(
+                                getSelectionStart(), getSelectionEnd()),
+                        mCalc);
                 break;
             case android.R.id.paste:
-                onTextPaste();
+                ClipboardHelper.paste(getContext(), mCalc);
                 break;
             case android.R.id.copy:
                 consumed = super.onTextContextMenuItem(id);
@@ -280,50 +212,16 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
         return consumed;
     }
 
-    /**
-     * Try to cut the current clipboard text
-     */
-    private void onTextCut() {
-        int selStart = getSelectionStart();
-        int selEnd = getSelectionEnd();
-
-        CharSequence copiedText = Objects.requireNonNull(getText()).subSequence(selStart, selEnd);
-
-        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        clipboard.setPrimaryClip(ClipData.newPlainText(null, copiedText));
-
-        //cut deletes the selected text
-        mCalc.parseKeyPressed("b");
-
-        //this was in the original function, keep for now
-        LAST_CUT_OR_COPY_TIME = SystemClock.uptimeMillis();
-
-        Toast.makeText(mContext, mContext.getString(R.string.toast_cut, copiedText), Toast.LENGTH_SHORT).show();
-    }
-
-
-    /**
-     * Try to paste the current clipboard text into this EditText
-     */
-    private void onTextPaste() {
-        String textToPaste;
-        ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = clipboard.getPrimaryClip();
-        textToPaste = Objects.requireNonNull(clip).getItemAt(0).coerceToText(getContext()).toString();
-        Toast.makeText(mContext, mContext.getString(R.string.toast_pasted, textToPaste), Toast.LENGTH_SHORT).show();
-        mCalc.pasteIntoExpression(textToPaste);
-    }
-
 
     @Override
     protected void onSelectionChanged(int selStart, int selEnd) {
         super.onSelectionChanged(selStart, selEnd);
         if (mCalc != null) {
-            int preLen = mTextPrefix.length();
-            int expLen = mExpressionText.length();
+            int preLen = mFormatter.getPrefix().length();
+            int expLen = mFormatter.getExpression().length();
 
-            int fixedSelStart = mSepHandler.makeIndexValid(selStart - preLen) + preLen;
-            int fixedSelEnd = mSepHandler.makeIndexValid((selEnd - preLen)) + preLen;
+            int fixedSelStart = mFormatter.getSepHandler().makeIndexValid(selStart - preLen) + preLen;
+            int fixedSelEnd = mFormatter.getSepHandler().makeIndexValid((selEnd - preLen)) + preLen;
 
             if (fixedSelStart != selStart || fixedSelEnd != selEnd) {
                 setSelection(fixedSelStart, fixedSelEnd);
@@ -349,8 +247,8 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
             }
 
             //save the new selection in the calc class
-            mCalc.setSelection(mSepHandler.translateFromSepIndex(selStart - preLen),
-                    mSepHandler.translateFromSepIndex(selEnd - preLen));
+            mCalc.setSelection(mFormatter.getSepHandler().translateFromSepIndex(selStart - preLen),
+                    mFormatter.getSepHandler().translateFromSepIndex(selEnd - preLen));
             setCursorVisible(true);
         }
     }

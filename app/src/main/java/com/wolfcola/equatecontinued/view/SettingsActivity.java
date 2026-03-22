@@ -6,14 +6,14 @@ import static com.wolfcola.equatecontinued.ResourceArrayParser.getUnitTypeNameAr
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.view.MenuItem;
+
+import androidx.preference.ListPreference;
+import androidx.preference.MultiSelectListPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,15 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
- * <p>
- * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
+ * Settings screen using AndroidX Preference.
  */
 public class SettingsActivity extends AppCompatActivity {
     public final static String UNIT_TYPE_PREF_KEY = "unit_type_prefs";
@@ -43,30 +35,20 @@ public class SettingsActivity extends AppCompatActivity {
      * to reflect its new value.
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
-            new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object value) {
-                    String stringValue = value.toString();
+            (preference, value) -> {
+                String stringValue = value.toString();
 
-                    if (preference instanceof ListPreference) {
-                        // For list preferences, look up the correct display value in
-                        // the preference's 'entries' list.
-                        ListPreference listPreference = (ListPreference) preference;
-                        int index = listPreference.findIndexOfValue(stringValue);
-
-                        // Set the summary to reflect the new value.
-                        preference.setSummary(
-                                index >= 0
-                                        ? listPreference.getEntries()[index]
-                                        : null);
-
-                    } else {
-                        // For all other preferences, set the summary to the value's
-                        // simple string representation.
-                        preference.setSummary(stringValue);
-                    }
-                    return true;
+                if (preference instanceof ListPreference) {
+                    ListPreference listPreference = (ListPreference) preference;
+                    int index = listPreference.findIndexOfValue(stringValue);
+                    preference.setSummary(
+                            index >= 0
+                                    ? listPreference.getEntries()[index]
+                                    : null);
+                } else {
+                    preference.setSummary(stringValue);
                 }
+                return true;
             };
 
 
@@ -95,7 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new PrefsFragment()).commit();
         setupActionBar();
     }
@@ -124,21 +106,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 
-    public static class PrefsFragment extends PreferenceFragment {
+    public static class PrefsFragment extends PreferenceFragmentCompat {
         @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
-            //setHasOptionsMenu(true);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences, rootKey);
 
             setUpUnitTypePrefs();
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-//         bindPreferenceSummaryToValue(findPreference("example_text"));
-//         bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 
         /**
@@ -146,7 +119,7 @@ public class SettingsActivity extends AppCompatActivity {
          */
         private void setUpUnitTypePrefs() {
             PreferenceScreen screen = getPreferenceScreen();
-            MultiSelectListPreference listPref = new MultiSelectListPreference(super.getActivity());
+            MultiSelectListPreference listPref = new MultiSelectListPreference(requireContext());
             listPref.setOrder(0);
             listPref.setDialogTitle(R.string.unit_select_title);
             listPref.setKey(UNIT_TYPE_PREF_KEY);
@@ -168,10 +141,8 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
-            ViewUtils.toast("other", getActivity());
 
             if (id == android.R.id.home) {
-                ViewUtils.toast("Home", getActivity());
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
             }

@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
@@ -32,8 +33,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     private static final String EXTRA_UNIT_TYPE_POS = "com.wolfcola.equatecontinued.unit_type_pos";
     private static final int NUM_MORE_FAVORITES = 3;
     private static final int NUM_UNITS_REQUIRED_FOR_FAVORITES = 25;
-    //this is for communication with the parent activity
-    OnConvertKeySelectedListener mCallback;
+    private CalcViewModel mViewModel;
     private UnitSearchDialogBuilder mSearchDialogBuilder;
     //holds UnitType for this fragment aka series of convert buttons
     private UnitType mUnitType;
@@ -62,22 +62,9 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mCallback = (OnConvertKeySelectedListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnConvertKeySelectedListener");
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity()).get(CalcViewModel.class);
 
         int pos = getArguments().getInt(EXTRA_UNIT_TYPE_POS);
 
@@ -108,39 +95,24 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
             mMoreButton.setText(getText(R.string.more_button));
             //button.setTypeface(null, Typeface.ITALIC);
 
-            mMoreButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // use a list dialog with search when there are lots of units
-                    if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
-                        createSearchDialog(getText(R.string.more_button_search_hint),
-                                new AdapterView.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                        mSearchDialogBuilder.cancelDialog();
-                                        UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
-                                        clickUnitButton(mUnitType
-                                                .findButtonPositionforUnitArrayPos(
-                                                        selectedItem.getUnitPosition()));
-//								updateFavorites(selectedItem.getUnitPosition());
-                                    }
-                                });
-                    } else {
-                        createMoreUnitsDialog(getText(R.string.select_unit),
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int item) {
-                                        clickUnitButton(item + mNumConvButtons);
-                                        updateFavorites(item + mNumConvButtons);
-                                    }
-                                },
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int item) {
-                                        createCustomUnitDialog();
-                                    }
-                                });
-                    }
+            mMoreButton.setOnClickListener(view -> {
+                // use a list dialog with search when there are lots of units
+                if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
+                    createSearchDialog(getText(R.string.more_button_search_hint),
+                            (parent, v, position, id) -> {
+                                mSearchDialogBuilder.cancelDialog();
+                                UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
+                                clickUnitButton(mUnitType
+                                        .findButtonPositionforUnitArrayPos(
+                                                selectedItem.getUnitPosition()));
+                            });
+                } else {
+                    createMoreUnitsDialog(getText(R.string.select_unit),
+                            (dialog, item) -> {
+                                clickUnitButton(item + mNumConvButtons);
+                                updateFavorites(item + mNumConvButtons);
+                            },
+                            (dialog, item) -> createCustomUnitDialog());
                 }
             });
         }
@@ -162,59 +134,42 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
             refreshButtonText(i);
 
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                    int viewId = view.getId();
-                    for (int i = 0; i < mNumConvButtons; i++) {
-                        if (convertButtonIds[i] == viewId) {
-                            //select key
-                            clickUnitButton(i);
-                            //don't continue looking through the button array
-                            break;
-                        }
+            button.setOnClickListener(view -> {
+                int viewId = view.getId();
+                for (int j = 0; j < mNumConvButtons; j++) {
+                    if (convertButtonIds[j] == viewId) {
+                        clickUnitButton(j);
+                        break;
                     }
-
                 }
             });
 
             final int buttonPos = i;
-            button.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    //if there are less units to display than slots, move on
-                    if (mUnitType.size() <= mNumConvButtons) return true;
+            button.setOnLongClickListener(view -> {
+                //if there are less units to display than slots, move on
+                if (mUnitType.size() <= mNumConvButtons) return true;
 
-                    String title = getText(R.string.word_Change)
-                            + " " + mUnitType.getUnit(buttonPos).getAbbreviation()
-                            + " " + getText(R.string.word_button)
-                            + " " + getText(R.string.word_to) + ":";
+                String title = getText(R.string.word_Change)
+                        + " " + mUnitType.getUnit(buttonPos).getAbbreviation()
+                        + " " + getText(R.string.word_button)
+                        + " " + getText(R.string.word_to) + ":";
 
-                    // use a list dialog with search when there are lots of units
-                    if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
-                        createSearchDialog(title, new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                mSearchDialogBuilder.cancelDialog();
-                                UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
-                                mUnitType.swapUnits(buttonPos, mUnitType
-                                        .findButtonPositionforUnitArrayPos(selectedItem.getUnitPosition()));
-                                refreshButtonText(buttonPos);
-                            }
-                        });
-                    } else {
-                        //pass the title and on item click listener
-                        createMoreUnitsDialog(title, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int item) {
-                                mUnitType.swapUnits(buttonPos, item + mNumConvButtons);
-                                refreshButtonText(buttonPos);
-                            }
-                        }, null);
-                    }
-                    return false;
+                // use a list dialog with search when there are lots of units
+                if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
+                    createSearchDialog(title, (parent, v, position, id) -> {
+                        mSearchDialogBuilder.cancelDialog();
+                        UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
+                        mUnitType.swapUnits(buttonPos, mUnitType
+                                .findButtonPositionforUnitArrayPos(selectedItem.getUnitPosition()));
+                        refreshButtonText(buttonPos);
+                    });
+                } else {
+                    createMoreUnitsDialog(title, (dialog, item) -> {
+                        mUnitType.swapUnits(buttonPos, item + mNumConvButtons);
+                        refreshButtonText(buttonPos);
+                    }, null);
                 }
+                return false;
             });
         }
         return v;
@@ -357,15 +312,12 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
                     Builder(getActivity());
             builder.setTitle(getText(R.string.historical_dialog_title));
             builder.setSingleChoiceItems(uhc.getPossibleYearsReversed(), uhc.getReversedYearIndex(),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int item) {
-                            dialog.dismiss();
-                            UnitHistCurrency uhc = (UnitHistCurrency) mUnitType.getUnit(buttonPos);
-                            uhc.setYearIndexReversed(item);
-                            refreshButtonText(buttonPos);
-                            tryConvert(buttonPos);
-                        }
+                    (dialog, item) -> {
+                        dialog.dismiss();
+                        UnitHistCurrency uhc2 = (UnitHistCurrency) mUnitType.getUnit(buttonPos);
+                        uhc2.setYearIndexReversed(item);
+                        refreshButtonText(buttonPos);
+                        tryConvert(buttonPos);
                     });
             //null seems to do the same as canceling the dialog
             builder.setNegativeButton(android.R.string.cancel, null);
@@ -405,7 +357,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
         }
 
         //always update screen to add/remove unit from expression
-        mCallback.updateScreen(true);
+        mViewModel.requestScreenUpdate(true);
     }
 
     private void colorSelectedButton() {
@@ -454,7 +406,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     }
 
     private void setSelectedButtonHighlight(boolean highlighted) {
-        mCallback.setEqualButtonColor(highlighted);
+        mViewModel.setUnitSelected(highlighted);
         //Don't color if "More" button was selected
         if (mUnitType.getCurrUnitButtonPos() < mNumConvButtons) {
             int currButtonPos = mUnitType.getCurrUnitButtonPos();
@@ -472,10 +424,4 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     }
 
 
-    // Container Activity must implement this interface
-    public interface OnConvertKeySelectedListener {
-        void updateScreen(boolean updateResult);
-
-        void setEqualButtonColor(boolean unitSet);
-    }
 }

@@ -4,25 +4,20 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -34,57 +29,33 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
-import com.wolfcola.equatecontinued.view.ConvKeysFragment.OnConvertKeySelectedListener;
 import com.wolfcola.equatecontinued.view.IdlingResource.SimpleIdlingResource;
-import com.viewpagerindicator.TabPageIndicator;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class CalcActivity extends AppCompatActivity
-        implements ResultListFragment.UnitSelectListener, OnConvertKeySelectedListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
     private static final String PRIVATE_PREF = "equate_app";
     private static final String VERSION_KEY = "version_number";
-    private static final int[] BUTTON_IDS = {
-            R.id.zero_button, R.id.one_button, R.id.two_button, R.id.three_button,
-            R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button,
-            R.id.eight_button, R.id.nine_button,
-
-            R.id.plus_button,
-            R.id.minus_button,
-            R.id.multiply_button,
-            R.id.divide_button,
-            R.id.percent_button,
-
-            R.id.decimal_button,
-            R.id.equals_button,
-            //		R.id.ee_button,
-            //		R.id.power_button,
-
-            R.id.clear_button,
-
-            R.id.open_para_button,
-            R.id.close_para_button,
-
-    };
 
     // Fixes Resources$NotFoundException on API < 19 when using vector drawables
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
-    private Context mAppContext;  //used for toasts and the like
-
     private ResultListFragment mResultListFrag;   //scroll-able history
     private EditTextDisplay mDisplay;      //main display
-    private ViewPager mUnitTypeViewPager;         //controls and displays UnitType
+    private ViewPager2 mUnitTypeViewPager;         //controls and displays UnitType
     private DynamicTextView mResultPreview;   //Result preview
     private UnitSearchDialogBuilder mSearchDialogBuilder; // Unit search dialog
 
@@ -93,16 +64,13 @@ public class CalcActivity extends AppCompatActivity
     private SimpleIdlingResource mIdlingResource;
 
     private Button mEqualsButton; //used for changing color
+    private CalcViewModel mViewModel;
     //main calculator object
     private Calculator mCalc;
-    //Crude fix: used to tell the ConvKeyViewPager what unit to select after
-    // scrolling to correct UnitType
-    private int unitPosToSelectAfterScroll = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAppContext = this;
         setContentView(R.layout.drawer_layout);
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -110,8 +78,21 @@ public class CalcActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //initialize ViewModel (survives configuration changes)
+        mViewModel = new ViewModelProvider(this).get(CalcViewModel.class);
         //either get old calc or create a new one
-        mCalc = Calculator.getCalculator(this);
+        mCalc = mViewModel.getCalc();
+
+        // Observe ViewModel events from fragments
+        mViewModel.getUpdateScreen().observe(this, updateResult -> {
+            if (updateResult != null) updateScreen(updateResult);
+        });
+        mViewModel.getUnitSelected().observe(this, selected -> {
+            if (selected != null) setEqualButtonColor(selected);
+        });
+        mViewModel.getSelectUnitEvent().observe(this, event -> {
+            if (event != null) selectUnitAtUnitArrayPos(event.unitPos, event.unitTypeKey);
+        });
 
         //main result display
         mDisplay = (EditTextDisplay) findViewById(R.id.textDisplay);
@@ -123,68 +104,39 @@ public class CalcActivity extends AppCompatActivity
         //we don't want the text view to go to two lines ever. this fixes that
         mResultPreview.setHorizontallyScrolling(true);
 
-        mResultPreview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                numButtonPressed("=");
-            }
-        });
+        mResultPreview.setOnClickListener(v -> numButtonPressed("="));
 
-        mResultPreview.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                CharSequence copiedText = mResultPreview.getText();
+        mResultPreview.setOnLongClickListener(v -> {
+            CharSequence copiedText = mResultPreview.getText();
 
-                ClipboardManager clipboard = (ClipboardManager) mAppContext.getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboard.setPrimaryClip(ClipData.newPlainText(null, copiedText));
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setPrimaryClip(ClipData.newPlainText(null, copiedText));
 
-                ViewUtils.toast("Copied: \"" + copiedText + "\"", mAppContext);
-                return true;
-            }
+            ViewUtils.toast("Copied: \"" + copiedText + "\"", CalcActivity.this);
+            return true;
         });
 
         //keyboard hiding wasn't working on Samsung device, brute force instead
-        mDisplay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ViewUtils.toast("onClick",mAppContext);
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(mDisplay.getWindowToken(), 0);
-            }
+        mDisplay.setOnClickListener(v -> {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(mDisplay.getWindowToken(), 0);
         });
 
         //hold click will select all text
-        mDisplay.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-//				//keyboard hiding wasn't working on Samsung device, brute force instead
-//				ViewUtils.toast("on long click",mAppContext);
-//				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//				imm.hideSoftInputFromWindow(mDisplay.getWindowToken(), 0);
-                mDisplay.selectAll();
-                return false;
-            }
+        mDisplay.setOnLongClickListener(v -> {
+            mDisplay.selectAll();
+            return false;
         });
 
         //clicking display will set solve=false, and will make the cursor visible
-        mDisplay.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //once the user clicks on part of the expression, don't want # to delete it
-                    mCalc.setSolved(false);
-                    mDisplay.setCursorVisible(true);
-                    mDisplay.clearHighlighted();
-                }
-//				else if(event.getAction()==MotionEvent.ACTION_UP){
-//					ViewUtils.toast("Action Up",mAppContext);
-//					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//					imm.hideSoftInputFromWindow(mDisplay.getWindowToken(), 0);
-//					return true;
-//				}
-                return false;
+        mDisplay.setOnTouchListener((view, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                //once the user clicks on part of the expression, don't want # to delete it
+                mCalc.setSolved(false);
+                mDisplay.setCursorVisible(true);
+                mDisplay.clearHighlighted();
             }
-
+            return false;
         });
 
         //use fragment manager to make the result list
@@ -197,189 +149,39 @@ public class CalcActivity extends AppCompatActivity
         }
 
 
-        for (int id : BUTTON_IDS) {
-            final Button button = (Button) findViewById(id);
-
-            //used for coloring the equals button
-            if (id == R.id.equals_button) mEqualsButton = button;
-
-            if (id == R.id.percent_button) {
-                ((AnimatedHoldButton) button)
-                        .setPrimaryText(mCalc.mPreferences.getPercentButMain());
-                ((AnimatedHoldButton) button)
-                        .setSecondaryText(mCalc.mPreferences.getPercentButSec());
+        mEqualsButton = ButtonManager.setup(this, mCalc, new ButtonManager.Callback() {
+            @Override
+            public void onButtonPressed(String key) {
+                numButtonPressed(key);
             }
-
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int buttonId = view.getId();
-                    String buttonValue = "";
-                    if (buttonId == R.id.plus_button) {
-                        buttonValue = "+";
-                    } else if (buttonId == R.id.minus_button) {
-                        buttonValue = "-";
-                    } else if (buttonId == R.id.multiply_button) {
-                        buttonValue = "*";
-                    } else if (buttonId == R.id.divide_button) {
-                        buttonValue = "/";
-                    } else if (buttonId == R.id.percent_button) {
-                        if (mCalc.mPreferences.getPercentButMain().equals("%")) {
-                            buttonValue = "%";
-                        } else {
-                            buttonValue = "E";
-                        }
-                    } else if (buttonId == R.id.decimal_button) {
-                        buttonValue = ".";
-                    } else if (buttonId == R.id.equals_button) {
-                        buttonValue = "=";
-                    } else if (buttonId == R.id.clear_button) {
-                        buttonValue = "c";
-                    } else if (buttonId == R.id.open_para_button) {
-                        buttonValue = "(";
-                    } else if (buttonId == R.id.close_para_button) {
-                        buttonValue = ")";
-                    } else if (buttonId == R.id.backspace_button) {
-                        buttonValue = "b";
-                    } else {
-                        // This loop checks for numerical values
-                        for (int i = 0; i < 10; i++) {
-                            if (buttonId == BUTTON_IDS[i]) {
-                                buttonValue = String.valueOf(i);
-                                break;
-                            }
-                        }
-                    }
-
-                    //pass button to calc, change convert key colors (maybe) and update screen
-                    numButtonPressed(buttonValue);
-                }
-            });
-
-            button.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    int buttonId = view.getId();
-                    String buttonValue = "";
-                    if (buttonId == R.id.multiply_button) {
-                        buttonValue = "^";
-                    } else if (buttonId == R.id.clear_button) {
-                        resetDialog();
-                    } else if (buttonId == R.id.equals_button) {
-                        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-                        drawer.openDrawer(GravityCompat.START);
-                    } else if (buttonId == R.id.percent_button) {
-                        if (mCalc.mPreferences.getPercentButSec().equals("EE")) {
-                            buttonValue = "E";
-                        } else {
-                            buttonValue = "%";
-                        }
-                    } else if (buttonId == R.id.nine_button) {
-                        mCalc.refreshAllDynamicUnits(true);
-                    } else if (buttonId == R.id.minus_button) {
-                        buttonValue = "n";
-                    } else if (buttonId == R.id.divide_button) {
-                        buttonValue = "i";
-                    } else if (buttonId == R.id.eight_button) {
-                        setUnitViewVisibility(UnitVisibility.TOGGLE);
-                    } else if (buttonId == R.id.open_para_button) {
-                        buttonValue = "[";
-                    } else if (buttonId == R.id.close_para_button) {
-                        buttonValue = "]";
-                    } else {
-                        return false;
-                    }
-
-                    //pass button to calc, change convert key colors (maybe) and update screen
-                    if (!buttonValue.equals(""))
-                        numButtonPressed(buttonValue);
-                    return true;
-                }
-            });
-
-            //extra long click for buttons with settings
-            if (button instanceof AnimatedHoldButton) {
-                final AnimatedHoldButton ahb = (AnimatedHoldButton) button;
-                ahb.setOnExtraLongClickListener(new AnimatedHoldButton.OnExtraLongClickListener() {
-                    @Override
-                    public void onExtraLongClick(View view) {
-                        int buttonId = view.getId();
-                        if (buttonId == R.id.percent_button) {
-                            //TODO add code to pop up dialog to switch buttons
-                            //TODO dialog reads "Set primary button function:"
-                            //TODO options will be %, E, ^, 1/x, and +/-
-                            //simple swap
-                            String main = mCalc.mPreferences.getPercentButMain();
-                            String sec = mCalc.mPreferences.getPercentButSec();
-                            mCalc.mPreferences.setPercentButMain(sec);
-                            mCalc.mPreferences.setPercentButSec(main);
-                            ViewUtils.toastLong("Button changed to " + sec, mAppContext);
-                            ahb.setPrimaryText(sec);
-                            ahb.setSecondaryText(main);
-                            ahb.invalidate();
-                        }
-                    }
-                });
-            }
-        }
-
-
-        ImageButton backspaceButton = (ImageButton) findViewById(R.id.backspace_button);
-        backspaceButton.setOnTouchListener(new View.OnTouchListener() {
-            private static final int NUM_COLOR_CHANGES = 10;
-            private final int BACKSPACE_REPEAT = ViewUtils.getLongClickTimeout(mAppContext);
-            private final int COLOR_CHANGE_PERIOD = BACKSPACE_REPEAT / NUM_COLOR_CHANGES;
-            private Handler mColorHoldHandler;
-            private View mView;
-            private int mInc;
-            //set up the runnable for when backspace is held down
-            Runnable mBackspaceColor = new Runnable() {
-                private int mStartColor = ContextCompat.getColor(mAppContext, R.color.op_button_pressed);
-                private int mEndColor = ContextCompat.getColor(mAppContext, R.color.backspace_button_held);
-
-                @Override
-                public void run() {
-                    // after color change is finished, repeat the backspace key every 100ms
-                    if (mInc == NUM_COLOR_CHANGES) {
-                        numButtonPressed("b");
-                        mColorHoldHandler.postDelayed(this, 100);
-                        return;
-                    }
-                    mColorHoldHandler.postDelayed(this, COLOR_CHANGE_PERIOD);
-
-                    float deltaRed = (float) Color.red(mStartColor) + ((float) Color.red(mEndColor) - (float) Color.red(mStartColor)) * ((float) mInc * (float) mInc * (float) mInc) / ((float) NUM_COLOR_CHANGES * (float) NUM_COLOR_CHANGES * (float) NUM_COLOR_CHANGES);
-
-                    int deltaGreen = Color.green(mStartColor) + ((Color.green(mEndColor) - Color.green(mStartColor)) * mInc) / NUM_COLOR_CHANGES;
-                    int deltaBlue = Color.blue(mStartColor) + ((Color.blue(mEndColor) - Color.blue(mStartColor)) * mInc) / NUM_COLOR_CHANGES;
-
-                    mView.setBackgroundColor(Color.argb(255, (int) deltaRed, deltaGreen, deltaBlue));
-                    mInc++;
-                }
-            };
 
             @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        numButtonPressed("b");
+            public void onResetRequested() {
+                resetDialog();
+            }
 
-                        mView = view;
-                        mInc = 0;
+            @Override
+            public void onDrawerRequested() {
+                DrawerLayout drawer = findViewById(R.id.drawer_layout);
+                drawer.openDrawer(GravityCompat.START);
+            }
 
-                        if (mColorHoldHandler != null) return true;
-                        mColorHoldHandler = new Handler();
-                        mColorHoldHandler.postDelayed(mBackspaceColor, COLOR_CHANGE_PERIOD);
+            @Override
+            public void onUnitViewToggle() {
+                setUnitViewVisibility(UnitVisibility.TOGGLE);
+            }
 
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (mColorHoldHandler == null) return true;
-                        view.setBackgroundColor(ContextCompat.getColor(mAppContext, R.color.op_button_normal));
+            @Override
+            public void onRefreshDynamicUnits() {
+                mCalc.refreshAllDynamicUnits(true);
+            }
 
-                        mColorHoldHandler.removeCallbacks(mBackspaceColor);
-                        mColorHoldHandler = null;
-                        break;
-                }
-                return false;
+            @Override
+            public void onPercentButtonSwapped(AnimatedHoldButton button, String newMain, String newSec) {
+                ViewUtils.toastLong("Button changed to " + newMain, CalcActivity.this);
+                button.setPrimaryText(newMain);
+                button.setSecondaryText(newSec);
+                button.invalidate();
             }
         });
 
@@ -395,34 +197,29 @@ public class CalcActivity extends AppCompatActivity
             setUnitViewVisibility(UnitVisibility.VISIBLE);
         }
 
-        //use fragment manager to make the result list
-        FragmentManager fm = getSupportFragmentManager();
-
-        mUnitTypeViewPager = (ViewPager) findViewById(R.id.unit_pager);
-        mUnitTypeViewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
+        mUnitTypeViewPager = (ViewPager2) findViewById(R.id.unit_pager);
+        mUnitTypeViewPager.setAdapter(new FragmentStateAdapter(this) {
             @Override
-            public int getCount() {
+            public int getItemCount() {
                 return mCalc.getUnitTypeSize();
             }
 
+            @NonNull
             @Override
-            public Fragment getItem(int pos) {
+            public Fragment createFragment(int pos) {
                 return ConvKeysFragment.newInstance(pos);
-            }
-
-            @Override
-            public CharSequence getPageTitle(int pos) {
-                return mCalc.getUnitTypeName(pos % mCalc.getUnitTypeSize());
             }
         });
 
-        TabPageIndicator mUnitTypeTabIndicator = (TabPageIndicator) findViewById(R.id.unit_type_titles);
-        mUnitTypeTabIndicator.setViewPager(mUnitTypeViewPager);
-        mUnitTypeTabIndicator.setVisibility(View.VISIBLE);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.unit_type_titles);
+        tabLayout.setVisibility(View.VISIBLE);
+
+        new TabLayoutMediator(tabLayout, mUnitTypeViewPager,
+                (tab, pos) -> tab.setText(mCalc.getUnitTypeName(pos % mCalc.getUnitTypeSize()))
+        ).attach();
 
         //need to tell calc when a new UnitType page is selected
-        mUnitTypeTabIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            //as the page is being scrolled to
+        mUnitTypeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int pos) {
                 // clear unit selection from current Unit Type before switching
@@ -445,11 +242,11 @@ public class CalcActivity extends AppCompatActivity
 
                 //if this change in UnitType was result of unit-ed result selection,
                 // select that unit
-                if (unitPosToSelectAfterScroll != -1) {
+                if (mViewModel.getUnitPosToSelectAfterScroll() != -1) {
                     ConvKeysFragment frag = getConvKeyFrag(mUnitTypeViewPager.getCurrentItem());
                     if (frag != null)
-                        frag.selectUnitAtUnitArrayPos(unitPosToSelectAfterScroll);
-                    unitPosToSelectAfterScroll = -1;
+                        frag.selectUnitAtUnitArrayPos(mViewModel.getUnitPosToSelectAfterScroll());
+                    mViewModel.clearUnitPosToSelectAfterScroll();
                 }
 
                 //clear out the unit in expression if it's now cleared
@@ -458,19 +255,10 @@ public class CalcActivity extends AppCompatActivity
                 //move the cursor to the right end (helps usability a bit)
                 mDisplay.setSelectionToEnd();
             }
-
-            @Override
-            public void onPageScrolled(int pos, float posOffset, int posOffsetPixels) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
         });
 
         //set page back to the previously selected page
-        mUnitTypeViewPager.setCurrentItem(mCalc.getUnitTypePos());
-        mUnitTypeTabIndicator.notifyDataSetChanged();
+        mUnitTypeViewPager.setCurrentItem(mCalc.getUnitTypePos(), false);
     }
 
     /**
@@ -497,37 +285,25 @@ public class CalcActivity extends AppCompatActivity
      * Helper function to setup the dialog used to reset the calculator.
      */
     private void resetDialog() {
-        new AlertDialog.Builder(mAppContext)
-                .setTitle(getText(R.string.reset_title))
+        new AlertDialog.Builder(this)
                 .setTitle(getText(R.string.reset_title))
                 .setItems(new CharSequence[]
                                 {getText(R.string.reset_clear_history), getText(R.string.reset_factory)},
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-                                switch (which) {
-                                    case 0:
-                                        clearHistory();
-                                        break;
-                                    case 1:
-                                        new AlertDialog.Builder(mAppContext)
-                                                .setMessage(getText(R.string.reset_factory_msg))
-                                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        resetCalculator();
-                                                    }
-                                                })
-                                                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                    }
-                                                })
-                                                .show();
-                                        break;
-                                }
+                        (dialog, which) -> {
+                            switch (which) {
+                                case 0:
+                                    clearHistory();
+                                    break;
+                                case 1:
+                                    new AlertDialog.Builder(CalcActivity.this)
+                                            .setMessage(getText(R.string.reset_factory_msg))
+                                            .setPositiveButton(android.R.string.yes, (d, w) -> resetCalculator())
+                                            .setNegativeButton(android.R.string.cancel, null)
+                                            .show();
+                                    break;
                             }
                         })
-                .setNegativeButton(android.R.string.cancel, null) // null cancels dialog
+                .setNegativeButton(android.R.string.cancel, null)
                 .create().show();
     }
 
@@ -539,7 +315,7 @@ public class CalcActivity extends AppCompatActivity
 
         updateScreen(true);
 
-        ViewUtils.toastCentered("History cleared", mAppContext);
+        ViewUtils.toastCentered("History cleared", this);
     }
 
     /**
@@ -558,7 +334,7 @@ public class CalcActivity extends AppCompatActivity
 
         updateScreen(true);
 
-        ViewUtils.toastCentered("Calculator reset", mAppContext);
+        ViewUtils.toastCentered("Calculator reset", this);
     }
 
     /**
@@ -585,12 +361,7 @@ public class CalcActivity extends AppCompatActivity
 
             builder.setTitle(getText(R.string.whats_new))
                     .setMessage(getText(R.string.version_description))
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
 
             builder.create().show();
 
@@ -603,9 +374,7 @@ public class CalcActivity extends AppCompatActivity
 
 
     /**
-     * Selects the a unit (used by result list)
-     *
-     * @see ResultListFragment.UnitSelectListener
+     * Selects a unit (used by result list via ViewModel)
      */
     public void selectUnitAtUnitArrayPos(int unitPos, String unitTypeKey) {
         int visibleUnitTypeIndex = mCalc.getUnitTypeIndex(unitTypeKey);
@@ -632,7 +401,7 @@ public class CalcActivity extends AppCompatActivity
         }
         //if not on right page, scroll there first
         if (visibleUnitTypeIndex != mUnitTypeViewPager.getCurrentItem()) {
-            unitPosToSelectAfterScroll = unitPos;
+            mViewModel.setUnitPosToSelectAfterScroll(unitPos);
             mUnitTypeViewPager.setCurrentItem(visibleUnitTypeIndex);
         } else {
             ConvKeysFragment frag = getConvKeyFrag(mUnitTypeViewPager.getCurrentItem());
@@ -678,7 +447,7 @@ public class CalcActivity extends AppCompatActivity
 
         mResultPreview.setVisibility(makePreviewVisible ? View.VISIBLE : View.GONE);
 
-        updatePreviewText(ContextCompat.getColor(mAppContext, R.color.preview_si_suffix_text_color));
+        updatePreviewText(ContextCompat.getColor(this, R.color.preview_si_suffix_text_color));
 
         //if we hit equals, update result list
         if (updateResult)
@@ -732,12 +501,11 @@ public class CalcActivity extends AppCompatActivity
      * @return will return the fragment or null if it doesn't exist at that position
      */
     private ConvKeysFragment getConvKeyFrag(int pos) {
-        FragmentStatePagerAdapter tempAdapter =
-                (FragmentStatePagerAdapter) mUnitTypeViewPager.getAdapter();
+        if (mUnitTypeViewPager.getAdapter() == null) return null;
         //make sure we aren't trying to access an invalid page fragment
-        if (pos < tempAdapter.getCount() && pos >= 0) {
-            return (ConvKeysFragment) tempAdapter.
-                    instantiateItem(mUnitTypeViewPager, pos);
+        if (pos < mUnitTypeViewPager.getAdapter().getItemCount() && pos >= 0) {
+            return (ConvKeysFragment) getSupportFragmentManager()
+                    .findFragmentByTag("f" + pos);
         } else return null;
     }
 
@@ -756,20 +524,16 @@ public class CalcActivity extends AppCompatActivity
                 mSearchDialogBuilder = new UnitSearchDialogBuilder(mCalc.getUnitTypeList());
             }
 
-            mSearchDialogBuilder.buildDialog(mAppContext,
+            mSearchDialogBuilder.buildDialog(this,
                     getString(R.string.find_unit),
                     mIdlingResource,
-                    new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            mSearchDialogBuilder.cancelDialog();
-                            UnitSearchItem item = mSearchDialogBuilder.getItem(position);
-                            selectUnitAtUnitArrayPos(item.getUnitPosition(), item.getUnitTypeKey());
-                        }
+                    (parent, view, position, searchId) -> {
+                        mSearchDialogBuilder.cancelDialog();
+                        UnitSearchItem searchItem = mSearchDialogBuilder.getItem(position);
+                        selectUnitAtUnitArrayPos(searchItem.getUnitPosition(), searchItem.getUnitTypeKey());
                     });
         } else if (id == R.id.nav_settings) {
-            Intent intent = new Intent(mAppContext, SettingsActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_about) {
             PackageInfo pInfo;
             String version = "unknown";
@@ -780,7 +544,7 @@ public class CalcActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            new AlertDialog.Builder(mAppContext)
+            new AlertDialog.Builder(this)
                     .setTitle(getText(R.string.about_title))
                     .setMessage(getText(R.string.about_version) + version +
                             "\n\n" + getText(R.string.about_message))
