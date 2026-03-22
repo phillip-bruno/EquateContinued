@@ -99,7 +99,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
                 // use a list dialog with search when there are lots of units
                 if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
                     createSearchDialog(getText(R.string.more_button_search_hint),
-                            (parent, v, position, id) -> {
+                            (adapterView, itemView, position, id) -> {
                                 mSearchDialogBuilder.cancelDialog();
                                 UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
                                 clickUnitButton(mUnitType
@@ -156,7 +156,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
                 // use a list dialog with search when there are lots of units
                 if (mUnitType.size() > SEARCH_DIALOG_MIN_SIZE) {
-                    createSearchDialog(title, (parent, v, position, id) -> {
+                    createSearchDialog(title, (adapterView, itemView, position, id) -> {
                         mSearchDialogBuilder.cancelDialog();
                         UnitSearchItem selectedItem = mSearchDialogBuilder.getItem(position);
                         mUnitType.swapUnits(buttonPos, mUnitType
