@@ -1,6 +1,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:customNS="http://schemas.android.com/apk/res/com.wolfcola.equatecontinued"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_background">
@@ -55,7 +55,7 @@
                 android:paddingLeft="@dimen/ResultPrevPadding"
                 android:paddingRight="@dimen/ResultPrevPadding"
                 android:scrollHorizontally="true"
-                customNS:minimumTextSize="15sp" />
+                app:minimumTextSize="15sp" />
         </LinearLayout>
 
         <View
@@ -75,7 +75,7 @@
             android:gravity="end|bottom"
             android:inputType="textNoSuggestions"
             android:textSize="40sp"
-            customNS:minimumTextSize="25sp" />
+            app:minimumTextSize="25sp" />
     </LinearLayout>
 
     <!-- Right half: unit container + button grid -->
@@ -128,16 +128,16 @@
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
             android:id="@+id/percent_button"
             style="@style/CalcButton.Operator"
-            customNS:primary_text="@string/percent_button"
-            customNS:secondary_text="@string/ee_button"
-            customNS:secondary_text_font_size_percentage="50" />
+            app:primary_text="@string/percent_button"
+            app:secondary_text="@string/ee_button"
+            app:secondary_text_font_size_percentage="50" />
 
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
             android:id="@+id/divide_button"
             style="@style/CalcButton.Operator"
-            customNS:primary_text="@string/divide_button"
-            customNS:secondary_text="@string/invert_button"
-            customNS:secondary_text_font_size_percentage="50" />
+            app:primary_text="@string/divide_button"
+            app:secondary_text="@string/invert_button"
+            app:secondary_text_font_size_percentage="50" />
 
         <ImageButton
             android:id="@+id/backspace_button"
@@ -177,8 +177,8 @@
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
             android:id="@+id/multiply_button"
             style="@style/CalcButton.Operator"
-            customNS:primary_text="@string/multiply_button"
-            customNS:secondary_text="@string/power_button" />
+            app:primary_text="@string/multiply_button"
+            app:secondary_text="@string/power_button" />
     </LinearLayout>
 
     <!-- Button row 3: 4, 5, 6, - -->
@@ -211,8 +211,8 @@
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
             android:id="@+id/minus_button"
             style="@style/CalcButton.Operator"
-            customNS:primary_text="@string/minus_button"
-            customNS:secondary_text="@string/negate_button" />
+            app:primary_text="@string/minus_button"
+            app:secondary_text="@string/negate_button" />
     </LinearLayout>
 
     <!-- Button row 4: 1, 2, 3, + -->
@@ -281,17 +281,17 @@
                 android:id="@+id/open_para_button"
                 style="@style/SmallOperator"
                 android:layout_marginRight="1dp"
-                customNS:primary_text="@string/open_para_button"
-                customNS:secondary_text="@string/open_para_long_button"
-                customNS:secondary_text_font_size_percentage="45" />
+                app:primary_text="@string/open_para_button"
+                app:secondary_text="@string/open_para_long_button"
+                app:secondary_text_font_size_percentage="45" />
 
             <com.wolfcola.equatecontinued.view.AnimatedHoldButton
                 android:id="@+id/close_para_button"
                 style="@style/SmallOperator"
                 android:layout_marginLeft="1dp"
-                customNS:primary_text="@string/close_para_button"
-                customNS:secondary_text="@string/close_para_long_button"
-                customNS:secondary_text_font_size_percentage="45" />
+                app:primary_text="@string/close_para_button"
+                app:secondary_text="@string/close_para_long_button"
+                app:secondary_text_font_size_percentage="45" />
         </LinearLayout>
 
         <Button
