@@ -101,8 +101,8 @@
     <string name="about">About</string>
     <string name="find_unit">Find Unit</string>
     <string name="find_unit_hint">Find unit:</string>
-    <string name="whats_new">What is new in v2.1.1</string>
-    <string name="version_description">—  Under the hood changes.</string>
+    <string name="whats_new">What is new in v2.2</string>
+    <string name="version_description">—  Modernized UI architecture for improved performance and stability.\n—  Smoother tab navigation for unit types.\n—  Improved screen rotation support.\n—  Various under the hood improvements.</string>
 
 
     <color name="equal_button_normal">#176B17</color>
