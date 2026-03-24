@@ -50,6 +50,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:layout_marginStart="@dimen/ResultPaddingLeft"
+                android:layout_marginLeft="@dimen/ResultPaddingLeft"
+                android:layout_marginEnd="@dimen/ResultPadding"
+                android:layout_marginRight="@dimen/ResultPadding"
                 android:contentDescription="@string/desc_result_preview"
                 android:gravity="end"
                 android:paddingLeft="@dimen/ResultPrevPadding"
@@ -68,10 +72,13 @@
             android:id="@+id/textDisplay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginStart="@dimen/ResultPaddingLeft"
+            android:layout_marginLeft="@dimen/ResultPaddingLeft"
+            android:layout_marginEnd="@dimen/ResultPadding"
+            android:layout_marginRight="@dimen/ResultPadding"
             android:background="@color/app_background"
             android:contentDescription="@string/desc_expression_display"
+            android:fontFamily="sans-serif-medium"
             android:gravity="end|bottom"
             android:inputType="textNoSuggestions"
             android:textSize="40sp"
@@ -273,14 +280,14 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="1dp"
+            android:layout_margin="@dimen/CalcButtonMargin"
             android:layout_weight="1"
             android:background="@color/app_background">
 
             <com.wolfcola.equatecontinued.view.AnimatedHoldButton
                 android:id="@+id/open_para_button"
                 style="@style/SmallOperator"
-                android:layout_marginRight="1dp"
+                android:layout_marginRight="@dimen/CalcButtonMargin"
                 app:primary_text="@string/open_para_button"
                 app:secondary_text="@string/open_para_long_button"
                 app:secondary_text_font_size_percentage="45" />
@@ -288,7 +295,7 @@
             <com.wolfcola.equatecontinued.view.AnimatedHoldButton
                 android:id="@+id/close_para_button"
                 style="@style/SmallOperator"
-                android:layout_marginLeft="1dp"
+                android:layout_marginLeft="@dimen/CalcButtonMargin"
                 app:primary_text="@string/close_para_button"
                 app:secondary_text="@string/close_para_long_button"
                 app:secondary_text_font_size_percentage="45" />

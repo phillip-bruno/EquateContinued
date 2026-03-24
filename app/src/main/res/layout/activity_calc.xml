@@ -79,6 +79,7 @@
                 android:layout_marginRight="@dimen/ResultPadding"
                 android:background="@color/app_background"
                 android:contentDescription="@string/desc_expression_display"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="end|bottom"
                 android:inputType="textNoSuggestions"
                 android:textSize="40sp"
@@ -98,7 +99,7 @@
                 android:id="@+id/unit_type_titles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:contentDescription="@string/desc_unit_type_tabs"
                 app:tabGravity="fill"
                 app:tabMode="scrollable"
                 app:tabTextAppearance="@style/TextAppearance.UnitTab" />

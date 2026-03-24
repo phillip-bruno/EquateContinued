@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/result_textview_normal" android:state_pressed="false" />
-    <item android:drawable="@drawable/result_textview_pressed" android:state_pressed="true" />
-
-</selector>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_result">
+    <item>
+        <selector>
+            <item android:drawable="@drawable/result_textview_pressed" android:state_pressed="true" />
+            <item android:drawable="@drawable/result_textview_normal" android:state_pressed="false" />
+        </selector>
+    </item>
+</ripple>

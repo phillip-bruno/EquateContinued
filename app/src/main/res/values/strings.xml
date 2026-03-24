@@ -104,64 +104,6 @@
     <string name="whats_new">What is new in v2.2</string>
     <string name="version_description">—  Modernized UI architecture for improved performance and stability.\n—  Smoother tab navigation for unit types.\n—  Improved screen rotation support.\n—  Various under the hood improvements.</string>
 
-
-    <color name="equal_button_normal">#176B17</color>
-    <color name="equal_button_pressed">#ff7cc97c</color>
-    <color name="equal_button_text_normal">#D4D4D4</color>
-    <color name="equal_button_text_pressed">#232323</color>
-
-    <color name="clear_button_pressed">#B23535</color>
-
-    <color name="num_button_normal">#191919</color>
-    <color name="num_button_pressed">#ff80a172</color> <!--used to be 93795B -->
-
-    <color name="op_button_normal">#282828</color>
-    <color name="op_button_pressed">#61AD61</color>
-    <color name="op_button_long_press_accent">#000000</color>
-
-    <color name="backspace_button_held">#E10000</color>
-
-    <color name="conv_button_normal">#191919</color>
-    <color name="conv_button_selected">#738E68</color>
-    <color name="conv_button_pressed">#97BC89</color>
-
-
-    <color name="button_secondary_text">#636363</color>
-    <color name="equals_secondary_text_color_normal">#ff969696</color>
-
-
-    <color name="button_text_normal">#D4D4D4</color>
-    <color name="button_text_pressed">#232323</color>
-
-    <!-- This is for the convert button that has been selected -->
-    <color name="button_text_conv_normal">#282828</color>
-    <color name="button_text_conv_pressed">#232323</color>
-
-    <!-- Accent color for convert buttons NOT selected -->
-    <color name="button_text_conv_not_selected">#1BC41B</color>
-
-    <color name="prev_curr_exp_divider">#252525</color>
-
-
-    <color name="result_text">#FFFFFF</color>
-
-    <color name="prev_result_text">#808080</color>
-    <color name="prev_result_text_pressed">#000000</color>
-
-    <color name="prev_result_text_timestamp">#606060</color>
-
-    <color name="preview_text_color">#B23535</color>
-    <color name="preview_si_suffix_text_color">#B23535</color>
-
-    <color name="highlight_from">#FFFF0000</color>
-    <color name="highlight_to">#FFFFFFFF</color>
-
-
-    <color name="app_background">#000000</color>
-    <dimen name="button_radius">0dp</dimen>
-
-    <color name="color_search_name_text">#FFFFFF</color>
-
     <!-- Unit Names -->
     <!--These names should not get translated, they're used internally only-->
     <string-array name="unit_type_array_combined">

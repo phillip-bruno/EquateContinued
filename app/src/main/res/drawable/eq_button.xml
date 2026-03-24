@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Pressed = tapped; NOT selected = brightly colored (normal)
-         Selected is when a unit button is pressed down, want to un-color
-         the equals button in this case so user doesn't press it-->
-    <item android:drawable="@drawable/op_button_pressed" android:state_pressed="true" android:state_selected="true" />
-    <item android:drawable="@drawable/eq_button_pressed" android:state_pressed="true" android:state_selected="false" />
-    <item android:drawable="@drawable/op_button_normal" android:state_pressed="false" android:state_selected="true" />
-    <item android:drawable="@drawable/eq_button_normal" android:state_pressed="false" android:state_selected="false" />
-</selector>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_eq">
+    <item>
+        <selector>
+            <!-- Pressed = tapped; NOT selected = brightly colored (normal)
+                 Selected is when a unit button is pressed down, want to un-color
+                 the equals button in this case so user doesn't press it-->
+            <item android:drawable="@drawable/op_button_pressed" android:state_pressed="true" android:state_selected="true" />
+            <item android:drawable="@drawable/eq_button_pressed" android:state_pressed="true" android:state_selected="false" />
+            <item android:drawable="@drawable/op_button_normal" android:state_pressed="false" android:state_selected="true" />
+            <item android:drawable="@drawable/eq_button_normal" android:state_pressed="false" android:state_selected="false" />
+        </selector>
+    </item>
+</ripple>
