@@ -33,6 +33,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -70,6 +72,7 @@ public class CalcActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
 
@@ -447,7 +450,7 @@ public class CalcActivity extends AppCompatActivity
 
         mResultPreview.setVisibility(makePreviewVisible ? View.VISIBLE : View.GONE);
 
-        updatePreviewText(ContextCompat.getColor(this, R.color.preview_si_suffix_text_color));
+        updatePreviewText(MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, 0));
 
         //if we hit equals, update result list
         if (updateResult)

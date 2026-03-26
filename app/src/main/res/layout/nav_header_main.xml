@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/app_name"
-        android:textColor="@color/nav_header_text"
+        android:textColor="?attr/colorOnPrimaryContainer"
         android:textSize="20sp"
         android:fontFamily="sans-serif-medium" />
 
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="4dp"
         android:text="@string/app_phrase"
-        android:textColor="@color/nav_header_subtitle"
+        android:textColor="?attr/colorOnPrimaryContainer"
         android:textSize="14sp"
         android:fontFamily="sans-serif-light" />
 

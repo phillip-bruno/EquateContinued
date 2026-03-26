@@ -11,6 +11,7 @@ import android.view.View;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.color.MaterialColors;
 import com.wolfcola.equatecontinued.R;
 
 public class AnimatedHoldButton extends SecondaryTextButton {
@@ -83,8 +84,8 @@ public class AnimatedHoldButton extends SecondaryTextButton {
         private void initializeColors() {
             if (mGradStartCol == null) {
                 mGradStartCol = mPressedColor;
-                mGradEndCol = ContextCompat.getColor(getContext(),
-                        R.color.op_button_long_press_accent);
+                mGradEndCol = MaterialColors.getColor(AnimatedHoldButton.this,
+                        com.google.android.material.R.attr.colorSurface, 0);
                 mAccentColor = mPressedColor;
                 mFinalColor = mPressedColor;
             }
@@ -105,7 +106,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
         try {
             mPrimaryText = ta.getString(R.styleable.AnimatedHoldButton_primary_text);
             mPressedColor = ta.getColor(R.styleable.AnimatedHoldButton_pressed_color,
-                    ContextCompat.getColor(context, R.color.op_button_pressed));
+                    MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, 0));
         } finally {
             ta.recycle();
         }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/ripple_clear">
+    android:color="?attr/colorError">
     <item>
         <selector>
             <item android:drawable="@drawable/clear_button_pressed" android:state_pressed="true" />

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/ripple_op">
+    android:color="?attr/colorPrimary">
     <item>
         <selector>
             <item android:drawable="@drawable/op_button_pressed" android:state_pressed="true" />

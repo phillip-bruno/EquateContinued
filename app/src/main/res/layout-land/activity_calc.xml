@@ -3,7 +3,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background">
+    android:background="?attr/colorSurface">
 
     <!-- Vertical guideline splitting screen 50/50 -->
     <androidx.constraintlayout.widget.Guideline
@@ -18,7 +18,7 @@
         android:id="@+id/left_section"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         android:gravity="bottom"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -42,7 +42,7 @@
                 android:id="@+id/prev_curr_exp_divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/prev_curr_exp_divider" />
+                android:background="?attr/colorOutlineVariant" />
 
             <com.wolfcola.equatecontinued.view.DynamicTextView
                 android:id="@+id/resultPreview"
@@ -66,7 +66,7 @@
             android:id="@+id/prev_curr_exp_divider2"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/prev_curr_exp_divider" />
+            android:background="?attr/colorOutlineVariant" />
 
         <com.wolfcola.equatecontinued.view.EditTextDisplay
             android:id="@+id/textDisplay"
@@ -76,7 +76,7 @@
             android:layout_marginLeft="@dimen/ResultPaddingLeft"
             android:layout_marginEnd="@dimen/ResultPadding"
             android:layout_marginRight="@dimen/ResultPadding"
-            android:background="@color/app_background"
+            android:background="?attr/colorSurface"
             android:contentDescription="@string/desc_expression_display"
             android:fontFamily="sans-serif-medium"
             android:gravity="end|bottom"
@@ -91,7 +91,7 @@
         android:id="@+id/unit_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/button_row_1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -120,7 +120,7 @@
         android:id="@+id/button_row_1"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toTopOf="@id/button_row_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline_mid"
@@ -159,7 +159,7 @@
         android:id="@+id/button_row_2"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toTopOf="@id/button_row_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline_mid"
@@ -193,7 +193,7 @@
         android:id="@+id/button_row_3"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toTopOf="@id/button_row_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline_mid"
@@ -227,7 +227,7 @@
         android:id="@+id/button_row_4"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toTopOf="@id/button_row_5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline_mid"
@@ -260,7 +260,7 @@
         android:id="@+id/button_row_5"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/app_background"
+        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline_mid"
@@ -282,7 +282,7 @@
             android:layout_height="match_parent"
             android:layout_margin="@dimen/CalcButtonMargin"
             android:layout_weight="1"
-            android:background="@color/app_background">
+            android:background="?attr/colorSurface">
 
             <com.wolfcola.equatecontinued.view.AnimatedHoldButton
                 android:id="@+id/open_para_button"

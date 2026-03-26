@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.color.MaterialColors;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
 
@@ -89,8 +90,8 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
      */
     public void setupHighlighting() {
         if (mCalc.isHighlighted()) {
-            int colorFrom = ContextCompat.getColor(getContext(), R.color.highlight_from);
-            int colorTo = ContextCompat.getColor(getContext(), R.color.highlight_to);
+            int colorFrom = MaterialColors.getColor(this, com.google.android.material.R.attr.colorError, 0);
+            int colorTo = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0);
             final int ANIMATE_DURR = 600; //ms
             mColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
             mColorAnimation.addUpdateListener(animator -> {

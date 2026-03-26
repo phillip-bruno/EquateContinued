@@ -18,6 +18,8 @@ import androidx.preference.PreferenceScreen;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.color.DynamicColors;
+
 import com.wolfcola.equatecontinued.R;
 
 import java.util.Collections;
@@ -75,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
 
         getSupportFragmentManager().beginTransaction()

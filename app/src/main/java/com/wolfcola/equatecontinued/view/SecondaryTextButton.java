@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.color.MaterialColors;
 import com.wolfcola.equatecontinued.R;
 
 class SecondaryTextButton extends androidx.appcompat.widget.AppCompatButton {
@@ -47,7 +48,7 @@ class SecondaryTextButton extends androidx.appcompat.widget.AppCompatButton {
             secTextPct = ta.getInteger(R.styleable.SecondaryTextButton_secondary_text_font_size_percentage,
                     SECONDARY_FONT_PERCENTAGE);
             mSecondaryTextColor = ta.getColor(R.styleable.SecondaryTextButton_secondary_text_color,
-                    ContextCompat.getColor(context, R.color.button_secondary_text));
+                    MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, 0));
         } finally {
             ta.recycle();
         }

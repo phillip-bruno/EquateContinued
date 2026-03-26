@@ -30,6 +30,6 @@
         android:padding="5dp"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/color_search_name_text" />
+        android:textColor="?attr/colorOnSurface" />
 
 </RelativeLayout>

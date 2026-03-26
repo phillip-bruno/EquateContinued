@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.color.MaterialColors;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
 
@@ -163,8 +164,8 @@ public class ButtonManager {
             private int mInc;
 
             Runnable mBackspaceColor = new Runnable() {
-                private int mStartColor = ContextCompat.getColor(activity, R.color.op_button_pressed);
-                private int mEndColor = ContextCompat.getColor(activity, R.color.backspace_button_held);
+                private int mStartColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorSecondaryContainer, 0);
+                private int mEndColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorError, 0);
 
                 @Override
                 public void run() {
@@ -200,7 +201,7 @@ public class ButtonManager {
                         break;
                     case MotionEvent.ACTION_UP:
                         if (mColorHoldHandler == null) return true;
-                        view.setBackgroundColor(ContextCompat.getColor(activity, R.color.op_button_normal));
+                        view.setBackgroundColor(MaterialColors.getColor(activity, com.google.android.material.R.attr.colorSurfaceContainerHigh, 0));
 
                         mColorHoldHandler.removeCallbacks(mBackspaceColor);
                         mColorHoldHandler = null;
