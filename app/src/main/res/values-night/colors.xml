@@ -1,72 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Night mode colors -->
+    <!-- Material 3 theme role colors (dark) -->
+    <color name="md_theme_primary">#AAC7FF</color>
+    <color name="md_theme_onPrimary">#0A305F</color>
+    <color name="md_theme_primaryContainer">#284777</color>
+    <color name="md_theme_onPrimaryContainer">#D6E3FF</color>
+    <color name="md_theme_secondary">#BEC6DC</color>
+    <color name="md_theme_onSecondary">#283141</color>
+    <color name="md_theme_secondaryContainer">#3E4759</color>
+    <color name="md_theme_onSecondaryContainer">#DAE2F9</color>
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_onError">#690005</color>
+    <color name="md_theme_surface">#111318</color>
+    <color name="md_theme_onSurface">#E2E2E9</color>
+    <color name="md_theme_onSurfaceVariant">#C4C6D0</color>
+    <color name="md_theme_outline">#8E9099</color>
+    <color name="md_theme_outlineVariant">#44474E</color>
 
-    <color name="app_background">#000000</color>
+    <!-- Dark mode colors -->
+
+    <color name="app_background">#111318</color>
 
     <!-- Number buttons -->
-    <color name="num_button_normal">#191919</color>
-    <color name="num_button_pressed">#ff80a172</color>
+    <color name="num_button_normal">#1D1F26</color>
+    <color name="num_button_pressed">#3B4963</color>
 
     <!-- Operator buttons -->
-    <color name="op_button_normal">#282828</color>
-    <color name="op_button_pressed">#61AD61</color>
-    <color name="op_button_long_press_accent">#000000</color>
+    <color name="op_button_normal">#282A31</color>
+    <color name="op_button_pressed">#3B4963</color>
+    <color name="op_button_long_press_accent">#111318</color>
 
     <!-- Equals button -->
-    <color name="equal_button_normal">#176B17</color>
-    <color name="equal_button_pressed">#ff7cc97c</color>
-    <color name="equal_button_text_normal">#D4D4D4</color>
-    <color name="equal_button_text_pressed">#232323</color>
+    <color name="equal_button_normal">#AAC7FF</color>
+    <color name="equal_button_pressed">#8BADE8</color>
+    <color name="equal_button_text_normal">#0A305F</color>
+    <color name="equal_button_text_pressed">#1D1F26</color>
 
     <!-- Clear / backspace -->
-    <color name="clear_button_pressed">#B23535</color>
-    <color name="backspace_button_held">#E10000</color>
+    <color name="clear_button_pressed">#93000A</color>
+    <color name="backspace_button_held">#BA1A1A</color>
 
     <!-- Convert buttons -->
-    <color name="conv_button_normal">#191919</color>
-    <color name="conv_button_selected">#738E68</color>
-    <color name="conv_button_pressed">#97BC89</color>
+    <color name="conv_button_normal">#1D1F26</color>
+    <color name="conv_button_selected">#3B4963</color>
+    <color name="conv_button_pressed">#4E6898</color>
 
     <!-- Button text -->
-    <color name="button_secondary_text">#636363</color>
-    <color name="equals_secondary_text_color_normal">#ff969696</color>
-    <color name="button_text_normal">#D4D4D4</color>
-    <color name="button_text_pressed">#232323</color>
-    <color name="button_text_conv_normal">#282828</color>
-    <color name="button_text_conv_pressed">#232323</color>
-    <color name="button_text_conv_not_selected">#1BC41B</color>
+    <color name="button_secondary_text">#8E9099</color>
+    <color name="equals_secondary_text_color_normal">#800A305F</color>
+    <color name="button_text_normal">#E2E2E9</color>
+    <color name="button_text_pressed">#D6E3FF</color>
+    <color name="button_text_conv_normal">#D6E3FF</color>
+    <color name="button_text_conv_pressed">#D6E3FF</color>
+    <color name="button_text_conv_not_selected">#AAC7FF</color>
 
     <!-- Dividers -->
-    <color name="prev_curr_exp_divider">#252525</color>
+    <color name="prev_curr_exp_divider">#44474E</color>
 
     <!-- Result / display text -->
-    <color name="result_text">#FFFFFF</color>
-    <color name="prev_result_text">#808080</color>
-    <color name="prev_result_text_pressed">#000000</color>
-    <color name="prev_result_text_timestamp">#909090</color>
-    <color name="preview_text_color">#4CAF50</color>
-    <color name="preview_si_suffix_text_color">#4CAF50</color>
+    <color name="result_text">#E2E2E9</color>
+    <color name="prev_result_text">#8E9099</color>
+    <color name="prev_result_text_pressed">#111318</color>
+    <color name="prev_result_text_timestamp">#8E9099</color>
+    <color name="preview_text_color">#AAC7FF</color>
+    <color name="preview_si_suffix_text_color">#AAC7FF</color>
 
     <!-- Highlight -->
-    <color name="highlight_from">#FFFF0000</color>
-    <color name="highlight_to">#FFFFFFFF</color>
+    <color name="highlight_from">#FFFFB4AB</color>
+    <color name="highlight_to">#FFE2E2E9</color>
 
     <!-- Search -->
-    <color name="color_search_name_text">#FFFFFF</color>
+    <color name="color_search_name_text">#E2E2E9</color>
 
     <!-- Ripple overlay colors -->
-    <color name="ripple_num">#3061AD61</color>
-    <color name="ripple_op">#3061AD61</color>
-    <color name="ripple_eq">#307cc97c</color>
-    <color name="ripple_clear">#30B23535</color>
-    <color name="ripple_conv">#3097BC89</color>
-    <color name="ripple_result">#3061AD61</color>
+    <color name="ripple_num">#30AAC7FF</color>
+    <color name="ripple_op">#30AAC7FF</color>
+    <color name="ripple_eq">#300A305F</color>
+    <color name="ripple_clear">#30FFB4AB</color>
+    <color name="ripple_conv">#30AAC7FF</color>
+    <color name="ripple_result">#30AAC7FF</color>
 
     <!-- Nav drawer -->
-    <color name="nav_header_start">#2E7D32</color>
-    <color name="nav_header_center">#1B5E20</color>
-    <color name="nav_header_end">#0D3B12</color>
-    <color name="nav_header_text">#FFFFFF</color>
-    <color name="nav_header_subtitle">#A5D6A7</color>
+    <color name="nav_header_start">#354A77</color>
+    <color name="nav_header_center">#284777</color>
+    <color name="nav_header_end">#0A305F</color>
+    <color name="nav_header_text">#E2E2E9</color>
+    <color name="nav_header_subtitle">#AAC7FF</color>
 </resources>

@@ -1,72 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light mode colors (default) -->
+    <!-- Material 3 theme role colors (light) -->
+    <color name="md_theme_primary">#415F91</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#D6E3FF</color>
+    <color name="md_theme_onPrimaryContainer">#001B3E</color>
+    <color name="md_theme_secondary">#565E71</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#DAE2F9</color>
+    <color name="md_theme_onSecondaryContainer">#131C2B</color>
+    <color name="md_theme_error">#BA1A1A</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+    <color name="md_theme_surface">#F8F9FF</color>
+    <color name="md_theme_onSurface">#1B1B1F</color>
+    <color name="md_theme_onSurfaceVariant">#44474E</color>
+    <color name="md_theme_outline">#74777F</color>
+    <color name="md_theme_outlineVariant">#C4C6D0</color>
 
-    <color name="app_background">#FAFAFA</color>
+    <!-- Light mode colors -->
+
+    <color name="app_background">#F8F9FF</color>
 
     <!-- Number buttons -->
     <color name="num_button_normal">#FFFFFF</color>
-    <color name="num_button_pressed">#C8E6C9</color>
+    <color name="num_button_pressed">#D6E3FF</color>
 
     <!-- Operator buttons -->
-    <color name="op_button_normal">#EEEEEE</color>
-    <color name="op_button_pressed">#A5D6A7</color>
-    <color name="op_button_long_press_accent">#FAFAFA</color>
+    <color name="op_button_normal">#E1E3E9</color>
+    <color name="op_button_pressed">#B4C8E8</color>
+    <color name="op_button_long_press_accent">#F8F9FF</color>
 
     <!-- Equals button -->
-    <color name="equal_button_normal">#4CAF50</color>
-    <color name="equal_button_pressed">#81C784</color>
+    <color name="equal_button_normal">#415F91</color>
+    <color name="equal_button_pressed">#5A7AAF</color>
     <color name="equal_button_text_normal">#FFFFFF</color>
-    <color name="equal_button_text_pressed">#1B5E20</color>
+    <color name="equal_button_text_pressed">#001B3E</color>
 
     <!-- Clear / backspace -->
-    <color name="clear_button_pressed">#EF5350</color>
-    <color name="backspace_button_held">#F44336</color>
+    <color name="clear_button_pressed">#BA1A1A</color>
+    <color name="backspace_button_held">#DD3730</color>
 
     <!-- Convert buttons -->
     <color name="conv_button_normal">#FFFFFF</color>
-    <color name="conv_button_selected">#A5D6A7</color>
-    <color name="conv_button_pressed">#C8E6C9</color>
+    <color name="conv_button_selected">#B4C8E8</color>
+    <color name="conv_button_pressed">#D6E3FF</color>
 
     <!-- Button text -->
-    <color name="button_secondary_text">#9E9E9E</color>
-    <color name="equals_secondary_text_color_normal">#80FFFFFF</color>
-    <color name="button_text_normal">#333333</color>
-    <color name="button_text_pressed">#1B5E20</color>
-    <color name="button_text_conv_normal">#1B5E20</color>
-    <color name="button_text_conv_pressed">#1B5E20</color>
-    <color name="button_text_conv_not_selected">#4CAF50</color>
+    <color name="button_secondary_text">#74777F</color>
+    <color name="equals_secondary_text_color_normal">#B3FFFFFF</color>
+    <color name="button_text_normal">#1B1B1F</color>
+    <color name="button_text_pressed">#001B3E</color>
+    <color name="button_text_conv_normal">#001B3E</color>
+    <color name="button_text_conv_pressed">#001B3E</color>
+    <color name="button_text_conv_not_selected">#415F91</color>
 
     <!-- Dividers -->
-    <color name="prev_curr_exp_divider">#E0E0E0</color>
+    <color name="prev_curr_exp_divider">#C4C6D0</color>
 
     <!-- Result / display text -->
-    <color name="result_text">#212121</color>
-    <color name="prev_result_text">#757575</color>
+    <color name="result_text">#1B1B1F</color>
+    <color name="prev_result_text">#74777F</color>
     <color name="prev_result_text_pressed">#FFFFFF</color>
-    <color name="prev_result_text_timestamp">#9E9E9E</color>
-    <color name="preview_text_color">#4CAF50</color>
-    <color name="preview_si_suffix_text_color">#4CAF50</color>
+    <color name="prev_result_text_timestamp">#74777F</color>
+    <color name="preview_text_color">#415F91</color>
+    <color name="preview_si_suffix_text_color">#415F91</color>
 
     <!-- Highlight -->
-    <color name="highlight_from">#FFFF0000</color>
-    <color name="highlight_to">#FF212121</color>
+    <color name="highlight_from">#FFBA1A1A</color>
+    <color name="highlight_to">#FF1B1B1F</color>
 
     <!-- Search -->
-    <color name="color_search_name_text">#212121</color>
+    <color name="color_search_name_text">#1B1B1F</color>
 
     <!-- Ripple overlay colors -->
-    <color name="ripple_num">#2081C784</color>
-    <color name="ripple_op">#304CAF50</color>
-    <color name="ripple_eq">#301B5E20</color>
-    <color name="ripple_clear">#30EF5350</color>
-    <color name="ripple_conv">#2081C784</color>
-    <color name="ripple_result">#204CAF50</color>
+    <color name="ripple_num">#20415F91</color>
+    <color name="ripple_op">#30415F91</color>
+    <color name="ripple_eq">#30001B3E</color>
+    <color name="ripple_clear">#30BA1A1A</color>
+    <color name="ripple_conv">#20415F91</color>
+    <color name="ripple_result">#20415F91</color>
 
     <!-- Nav drawer -->
-    <color name="nav_header_start">#81C784</color>
-    <color name="nav_header_center">#4CAF50</color>
-    <color name="nav_header_end">#388E3C</color>
+    <color name="nav_header_start">#5A7AAF</color>
+    <color name="nav_header_center">#415F91</color>
+    <color name="nav_header_end">#2B4474</color>
     <color name="nav_header_text">#FFFFFF</color>
-    <color name="nav_header_subtitle">#E8F5E9</color>
+    <color name="nav_header_subtitle">#D6E3FF</color>
 </resources>
