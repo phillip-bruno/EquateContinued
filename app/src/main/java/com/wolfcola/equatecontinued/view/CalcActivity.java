@@ -17,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -33,7 +32,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.color.DynamicColors;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -65,14 +63,12 @@ public class CalcActivity extends AppCompatActivity
     @Nullable
     private SimpleIdlingResource mIdlingResource;
 
-    private Button mEqualsButton; //used for changing color
     private CalcViewModel mViewModel;
     //main calculator object
     private Calculator mCalc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DynamicColors.applyToActivityIfAvailable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
 
@@ -89,9 +85,6 @@ public class CalcActivity extends AppCompatActivity
         // Observe ViewModel events from fragments
         mViewModel.getUpdateScreen().observe(this, updateResult -> {
             if (updateResult != null) updateScreen(updateResult);
-        });
-        mViewModel.getUnitSelected().observe(this, selected -> {
-            if (selected != null) setEqualButtonColor(selected);
         });
         mViewModel.getSelectUnitEvent().observe(this, event -> {
             if (event != null) selectUnitAtUnitArrayPos(event.unitPos, event.unitTypeKey);
@@ -152,7 +145,7 @@ public class CalcActivity extends AppCompatActivity
         }
 
 
-        mEqualsButton = ButtonManager.setup(this, mCalc, new ButtonManager.Callback() {
+        ButtonManager.setup(this, mCalc, new ButtonManager.Callback() {
             @Override
             public void onButtonPressed(String key) {
                 numButtonPressed(key);
@@ -474,15 +467,6 @@ public class CalcActivity extends AppCompatActivity
 
     private void updatePreviewText(int suffixColor) {
         mResultPreview.setText(mCalc.getPreviewText(suffixColor));
-    }
-
-    /**
-     * Changes equals button color according the the input boolean value.
-     * Equals button is colored normally when button is not selected. When
-     * a unit is selected, equals button looks like a regular op button
-     */
-    public void setEqualButtonColor(boolean unHighlighted) {
-        mEqualsButton.setSelected(unHighlighted);
     }
 
     /**

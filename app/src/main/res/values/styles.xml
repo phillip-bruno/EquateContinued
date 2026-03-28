@@ -45,7 +45,7 @@
 
     <style name="CalcButton.Equals">
         <item name="android:background">@drawable/eq_button</item>
-        <item name="android:textColor">@drawable/eq_button_text_color</item>
+        <item name="android:textColor">@drawable/button_text_color</item>
     </style>
 
     <style name="CalcButton.Clear">

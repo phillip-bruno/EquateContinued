@@ -301,7 +301,7 @@
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
             android:id="@+id/equals_button"
             style="@style/CalcButton.Equals"
-            app:pressed_color="?attr/colorPrimaryContainer"
+            app:pressed_color="?attr/colorSecondaryContainer"
             app:primary_text="@string/equals_button"
             app:secondary_text="@string/equals_secondary_text"
             app:secondary_text_color="@color/equals_secondary_text_color_normal" />
