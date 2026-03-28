@@ -2,6 +2,7 @@ package com.wolfcola.equatecontinued.view;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
@@ -155,6 +156,7 @@ public class ButtonManager {
 
     private static void setupBackspaceHold(Activity activity, Callback callback) {
         ImageButton backspaceButton = (ImageButton) activity.findViewById(R.id.backspace_button);
+        final Drawable normalDrawable = backspaceButton.getBackground();
         backspaceButton.setOnTouchListener(new View.OnTouchListener() {
             private static final int NUM_COLOR_CHANGES = 10;
             private final int BACKSPACE_REPEAT = ViewUtils.getLongClickTimeout(activity);
@@ -201,7 +203,7 @@ public class ButtonManager {
                         break;
                     case MotionEvent.ACTION_UP:
                         if (mColorHoldHandler == null) return true;
-                        view.setBackgroundColor(MaterialColors.getColor(activity, com.google.android.material.R.attr.colorSurfaceContainerHigh, 0));
+                        view.setBackground(normalDrawable);
 
                         mColorHoldHandler.removeCallbacks(mBackspaceColor);
                         mColorHoldHandler = null;

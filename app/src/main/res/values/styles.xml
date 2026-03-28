@@ -18,6 +18,10 @@
         <item name="colorOnSurface">@color/md_theme_onSurface</item>
         <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
         <item name="colorOutline">@color/md_theme_outline</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
+        <item name="colorSurfaceContainerLowest">@color/md_theme_surfaceContainerLowest</item>
+        <item name="materialButtonStyle">@style/Widget.Material3.Button.UnelevatedButton</item>
+        <item name="android:buttonStyle">@style/Widget.Material3.Button.UnelevatedButton</item>
     </style>
 
     <style name="AppBaseTheme.NoActionBar">
@@ -31,6 +35,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_margin">@dimen/CalcButtonMargin</item>
         <item name="android:textSize">30sp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="CalcButton.Numb">
@@ -65,7 +70,9 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">@dimen/CalcButtonMargin</item>
         <item name="android:textSize">30sp</item>
+        <item name="android:stateListAnimator">@null</item>
         <item name="android:background">@drawable/op_button</item>
         <item name="android:textColor">@drawable/button_text_color</item>
     </style>

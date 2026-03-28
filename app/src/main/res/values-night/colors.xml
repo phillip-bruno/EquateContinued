@@ -17,6 +17,10 @@
     <color name="md_theme_outline">#8E9099</color>
     <color name="md_theme_outlineVariant">#44474E</color>
 
+    <!-- Material 3 surface container tones (dark) -->
+    <color name="md_theme_surfaceContainerHigh">#2B2D31</color>
+    <color name="md_theme_surfaceContainerLowest">#0E1014</color>
+
     <!-- Equals button secondary text (referenced in activity_calc.xml) -->
     <color name="equals_secondary_text_color_normal">#80C4C6D0</color>
 </resources>
