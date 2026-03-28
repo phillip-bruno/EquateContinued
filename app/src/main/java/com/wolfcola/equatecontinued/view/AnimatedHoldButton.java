@@ -106,7 +106,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
         try {
             mPrimaryText = ta.getString(R.styleable.AnimatedHoldButton_primary_text);
             mPressedColor = ta.getColor(R.styleable.AnimatedHoldButton_pressed_color,
-                    MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, 0));
+                    MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimary, 0));
         } finally {
             ta.recycle();
         }

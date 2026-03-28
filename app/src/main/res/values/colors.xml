@@ -22,5 +22,5 @@
     <color name="md_theme_surfaceContainerLowest">#FFFFFF</color>
 
     <!-- Equals button secondary text (referenced in activity_calc.xml) -->
-    <color name="equals_secondary_text_color_normal">#8044474E</color>
+    <color name="equals_secondary_text_color_normal">#80001B3E</color>
 </resources>

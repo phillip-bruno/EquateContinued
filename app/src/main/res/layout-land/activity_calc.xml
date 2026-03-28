@@ -137,6 +137,7 @@
             style="@style/CalcButton.Operator"
             app:primary_text="@string/percent_button"
             app:secondary_text="@string/ee_button"
+            app:secondary_text_color="?attr/colorOnPrimaryContainer"
             app:secondary_text_font_size_percentage="50" />
 
         <com.wolfcola.equatecontinued.view.AnimatedHoldButton
@@ -144,6 +145,7 @@
             style="@style/CalcButton.Operator"
             app:primary_text="@string/divide_button"
             app:secondary_text="@string/invert_button"
+            app:secondary_text_color="?attr/colorOnPrimaryContainer"
             app:secondary_text_font_size_percentage="50" />
 
         <ImageButton
@@ -185,7 +187,8 @@
             android:id="@+id/multiply_button"
             style="@style/CalcButton.Operator"
             app:primary_text="@string/multiply_button"
-            app:secondary_text="@string/power_button" />
+            app:secondary_text="@string/power_button"
+            app:secondary_text_color="?attr/colorOnPrimaryContainer" />
     </LinearLayout>
 
     <!-- Button row 3: 4, 5, 6, - -->
@@ -219,7 +222,8 @@
             android:id="@+id/minus_button"
             style="@style/CalcButton.Operator"
             app:primary_text="@string/minus_button"
-            app:secondary_text="@string/negate_button" />
+            app:secondary_text="@string/negate_button"
+            app:secondary_text_color="?attr/colorOnPrimaryContainer" />
     </LinearLayout>
 
     <!-- Button row 4: 1, 2, 3, + -->
