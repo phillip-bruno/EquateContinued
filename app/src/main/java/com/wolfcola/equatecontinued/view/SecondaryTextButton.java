@@ -56,6 +56,9 @@ class SecondaryTextButton extends androidx.appcompat.widget.AppCompatButton {
         mSecondaryTextSize = getPaint().getTextSize() * secTextPct / 100f;
 
         mSecondaryPaint = new Paint(getPaint());
+
+        // Disable Material 3's automatic backgroundTint which overrides custom drawables
+        setBackgroundTintList(null);
     }
 
 
