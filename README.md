@@ -36,14 +36,51 @@ The debug APK will be at `app/build/outputs/apk/debug/`.
 
 For a signed release build, supply your keystore via Gradle properties or environment variables, see the CI workflow below.
 
+## Releasing
+
+Releases are published automatically by pushing a version tag:
+
+```bash
+git tag v2.3.0
+git push origin v2.3.0
+```
+
+The CI workflow will build a signed release APK and AAB, then create a GitHub Release with both files attached and auto-generated release notes from commit messages.
+
+### Keystore Setup
+
+The release build requires a signing keystore. Generate one if you don't have one:
+
+```bash
+keytool -genkeypair -v -keystore release-key.jks -alias equate \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Then encode it for use as a GitHub secret:
+
+```bash
+base64 -w0 release-key.jks
+```
+
+### GitHub Secrets
+
+Add the following secrets to your repository (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|---|---|
+| `KEYSTORE_BASE64` | Base64-encoded keystore file (output of the command above) |
+| `KEYSTORE_PASSWORD` | Password for the keystore file |
+| `KEY_ALIAS` | Key alias (e.g. `equate`) |
+| `KEY_PASSWORD` | Password for the key |
+
 ## CI/CD
 
-GitHub Actions runs on every push and PR to `master`:
+GitHub Actions runs on every push and PR to `master`, and on `v*` tags:
 
-1. Checkout + JDK 21 setup
-2. Gradle build
-3. Unit tests
-4. Artifact upload (APK + test reports)
+| Trigger | Jobs |
+|---|---|
+| Push / PR to `master` | Build debug APK, run unit tests, upload artifacts |
+| `v*` tag | All of the above + signed release APK & AAB + GitHub Release |
 
 Workflow definition: [`.github/workflows/android.yml`](.github/workflows/android.yml)
 
