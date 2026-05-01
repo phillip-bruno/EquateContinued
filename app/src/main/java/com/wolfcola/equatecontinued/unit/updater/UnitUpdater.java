@@ -24,9 +24,9 @@ import java.util.HashMap;
  * Created by Evan on 10/2/2015.
  */
 public class UnitUpdater {
-    private static int UPDATE_TIMEOUT_MIN = 90;
-    private Context mContext;
-    private ArrayList<Integer> mUnitsToUpdate;
+    private static final int UPDATE_TIMEOUT_MIN = 90;
+    private final Context mContext;
+    private final ArrayList<Integer> mUnitsToUpdate;
 
     public UnitUpdater(Context mContext) {
         this.mContext = mContext;
@@ -63,7 +63,7 @@ public class UnitUpdater {
         Date now = new Date();
         return !(ut.getLastUpdateTime() != null && (now.getTime() -
                 ut.getLastUpdateTime().getTime())
-                < (60 * 1000 * UPDATE_TIMEOUT_MIN));
+                < (60L * 1000 * UPDATE_TIMEOUT_MIN));
     }
 
     /**
@@ -71,10 +71,10 @@ public class UnitUpdater {
      * the actual retrieval of the Yahoo XML file that contains the current rates
      */
     private static class UpdateCurrenciesAsyncTask extends AsyncTask<Void, Void, Boolean> {
-        private Context mContext;
-        private UnitType mUnitType;
-        private ArrayList<Integer> mUnitsToUpdate;
-        private Boolean mForced;
+        private final Context mContext;
+        private final UnitType mUnitType;
+        private final ArrayList<Integer> mUnitsToUpdate;
+        private final Boolean mForced;
         private ErrorCause mErrorCause;
         /**
          * Constructor to create a new Asynchronous task used to update currencies
@@ -206,8 +206,8 @@ public class UnitUpdater {
                 UnitCurrency u = ((UnitCurrency) ut.getUnitPosInUnitArray(i));
                 CurrencyURLParser.Entry entry = currRates.get(u.getAbbreviation());
                 if (entry != null) {
-                    u.setValue(entry.price);
-                    u.setUpdateDate(entry.date);
+                    u.setValue(entry.price());
+                    u.setUpdateDate(entry.date());
                 } else {
                     //this is for BTC and other units that don't get updated by yahoo
                     mUnitsToUpdate.add(i);

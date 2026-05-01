@@ -11,7 +11,7 @@ public class ConvertButton extends SecondaryTextButton {
 
     private String mTopText;
     private String mBotText;
-    private String mArrowText;
+    private final String mArrowText;
 
     private float mTopTextX;
     private float mBotTextX;

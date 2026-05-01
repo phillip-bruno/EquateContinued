@@ -155,7 +155,7 @@ public class Solver {
                 //this is the inside of the outermost parentheses set, recurse over inside to find more parentheses
                 String middleSection = collapsePara(str.substring(firstPara + 1, matchingPara));
                 //this is after the close of the outermost found set, might be lots of operators/numbers or ""
-                String endSection = str.substring(matchingPara + 1, str.length());
+                String endSection = str.substring(matchingPara + 1);
 
                 //all parentheses found, splice string back together
                 str = collapsePara(firstSection + middleSection + endSection);

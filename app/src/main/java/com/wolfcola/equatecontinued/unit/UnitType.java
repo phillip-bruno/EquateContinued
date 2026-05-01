@@ -26,14 +26,14 @@ public class UnitType {
     private static final String JSON_UNIT_ARRAY = "unit_array";
     private static final String JSON_UPDATE_TIME = "update_time";
 
-    private String mName;
-    private ArrayList<Unit> mUnitArray;
+    private final String mName;
+    private final ArrayList<Unit> mUnitArray;
     private Unit mPrevUnit;
     private Unit mCurrUnit;
     private boolean mIsUnitSelected;
     private boolean mContainsDynamicUnits = false;
     //Order to display units (based on mUnitArray index
-    private ArrayList<Integer> mUnitDisplayOrder;
+    private final ArrayList<Integer> mUnitDisplayOrder;
 
     // flag used to tell if the unit is currently being asynchronously updated
     private boolean mUpdating = false;

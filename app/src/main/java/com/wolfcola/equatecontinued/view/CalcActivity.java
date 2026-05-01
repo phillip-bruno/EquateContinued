@@ -23,7 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -74,7 +73,7 @@ public class CalcActivity extends AppCompatActivity
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //initialize ViewModel (survives configuration changes)
@@ -87,12 +86,12 @@ public class CalcActivity extends AppCompatActivity
             if (updateResult != null) updateScreen(updateResult);
         });
         mViewModel.getSelectUnitEvent().observe(this, event -> {
-            if (event != null) selectUnitAtUnitArrayPos(event.unitPos, event.unitTypeKey);
+            if (event != null) selectUnitAtUnitArrayPos(event.unitPos(), event.unitTypeKey());
         });
 
         //main result display
-        mDisplay = (EditTextDisplay) findViewById(R.id.textDisplay);
-        mResultPreview = (DynamicTextView) findViewById(R.id.resultPreview);
+        mDisplay = findViewById(R.id.textDisplay);
+        mResultPreview = findViewById(R.id.resultPreview);
         mDisplay.setCalc(mCalc);
         mDisplay.disableSoftInputFromAppearing();
 
@@ -193,7 +192,7 @@ public class CalcActivity extends AppCompatActivity
             setUnitViewVisibility(UnitVisibility.VISIBLE);
         }
 
-        mUnitTypeViewPager = (ViewPager2) findViewById(R.id.unit_pager);
+        mUnitTypeViewPager = findViewById(R.id.unit_pager);
         mUnitTypeViewPager.setAdapter(new FragmentStateAdapter(this) {
             @Override
             public int getItemCount() {
@@ -207,7 +206,7 @@ public class CalcActivity extends AppCompatActivity
             }
         });
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.unit_type_titles);
+        TabLayout tabLayout = findViewById(R.id.unit_type_titles);
         tabLayout.setVisibility(View.VISIBLE);
 
         new TabLayoutMediator(tabLayout, mUnitTypeViewPager,
@@ -406,7 +405,7 @@ public class CalcActivity extends AppCompatActivity
     }
 
     private void setUnitViewVisibility(UnitVisibility uv) {
-        final LinearLayout mUnitContain = (LinearLayout) findViewById(R.id.unit_container);
+        final LinearLayout mUnitContain = findViewById(R.id.unit_container);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (uv == UnitVisibility.HIDDEN || mCalc.getUnitTypeSize() == 0 ||
@@ -539,14 +538,14 @@ public class CalcActivity extends AppCompatActivity
                     .show();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

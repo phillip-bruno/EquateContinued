@@ -89,40 +89,38 @@ class MyActivityTestRule<A extends CalcActivity> extends ActivityTestRule<A> {
             sp.edit().clear().apply();
             File fileToDelete = new File(root + "/shared_prefs/" + fileName);
             boolean wasSuccessful = fileToDelete.delete();
-            Log.d("ESPRESSO_LOG", "File deleted = " + String.valueOf(wasSuccessful));
+            Log.d("ESPRESSO_LOG", "File deleted = " + wasSuccessful);
         }
     }
 
 
-    private static class CustomFailureHandle implements FailureHandler {
-        private final FailureHandler delegate;
+    private record CustomFailureHandle(FailureHandler delegate) implements FailureHandler {
+            private CustomFailureHandle(Context delegate) {
+                this.delegate = new DefaultFailureHandler(delegate);
+            }
 
-        public CustomFailureHandle(Context targetContext) {
-            delegate = new DefaultFailureHandler(targetContext);
-        }
+            /**
+             * Handle the given error in a manner that makes sense to the environment
+             * in which the test is executed (e.g. take a screenshot, output extra
+             * debug info, etc). Upon handling, most handlers will choose to propagate
+             * the error.
+             *
+             * @param error
+             * @param viewMatcher
+             */
+            @Override
+            public void handle(Throwable error, Matcher<View> viewMatcher) {
+                try {
+                    delegate.handle(error, viewMatcher);
+                } catch (NoMatchingViewException e) {
+                    throw new MySpecialException(e);
+                }
+            }
 
-        /**
-         * Handle the given error in a manner that makes sense to the environment
-         * in which the test is executed (e.g. take a screenshot, output extra
-         * debug info, etc). Upon handling, most handlers will choose to propagate
-         * the error.
-         *
-         * @param error
-         * @param viewMatcher
-         */
-        @Override
-        public void handle(Throwable error, Matcher<View> viewMatcher) {
-            try {
-                delegate.handle(error, viewMatcher);
-            } catch (NoMatchingViewException e) {
-                throw new MySpecialException(e);
+            private static class MySpecialException extends RuntimeException {
+                MySpecialException(Throwable cause) {
+                    super(cause);
+                }
             }
         }
-
-        private static class MySpecialException extends RuntimeException {
-            MySpecialException(Throwable cause) {
-                super(cause);
-            }
-        }
-    }
 }

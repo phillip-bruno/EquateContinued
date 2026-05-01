@@ -22,7 +22,7 @@ import java.util.LinkedHashSet;
 class FilterAdapter extends BaseAdapter implements Filterable {
     private ArrayList<UnitSearchItem> mArrayList; // current values post filtering
     private ArrayList<UnitSearchItem> mOriginalValues; // values pre filtering
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
 
     FilterAdapter(Context context, ArrayList<UnitSearchItem> arrayList) {
         this.mArrayList = arrayList;
@@ -56,8 +56,8 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.filter_dialog_list_row, parent, false);
-            holder.mNameTextView = (TextView) convertView.findViewById(R.id.search_dialog_name_textView);
-            holder.mAbbreviationTextView = (TextView) convertView.findViewById(R.id.search_dialog_abbreviation_textView);
+            holder.mNameTextView = convertView.findViewById(R.id.search_dialog_name_textView);
+            holder.mAbbreviationTextView = convertView.findViewById(R.id.search_dialog_abbreviation_textView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -136,7 +136,7 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
                         // next add results that have multiple words with non-first
                         // starting letter
-                        String dataArray[] = data.split(" ");
+                        String[] dataArray = data.split(" ");
                         for (String part : dataArray) {
                             // remove all brackets
                             if (part.replaceAll("\\(|\\)", "")

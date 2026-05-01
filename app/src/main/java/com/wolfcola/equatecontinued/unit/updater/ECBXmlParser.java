@@ -84,16 +84,16 @@ public class ECBXmlParser extends CurrencyURLParser {
      */
     private HashMap<String, Entry> convertEuroToDollar(HashMap<String, Entry> euroBased) {
         HashMap<String, Entry> dollarBased = new HashMap<>();
-        double dollarPrice = euroBased.get("USD").price;
+        double dollarPrice = euroBased.get("USD").price();
         for (Map.Entry<String, Entry> e : euroBased.entrySet()) {
             String key = e.getKey();
             Entry value = e.getValue();
-            double newPrice = value.price / dollarPrice;
-            dollarBased.put(key, new Entry(newPrice, value.symbol, value.date));
+            double newPrice = value.price() / dollarPrice;
+            dollarBased.put(key, new Entry(newPrice, value.symbol(), value.date()));
         }
 
         //remove the USD entry and replace with EUR
-        Date date = dollarBased.get("USD").date;
+        Date date = dollarBased.get("USD").date();
         dollarBased.remove("USD");
         dollarBased.put("EUR", new Entry(1 / dollarPrice, "EUR", date));
         return dollarBased;
@@ -188,7 +188,7 @@ public class ECBXmlParser extends CurrencyURLParser {
                 Entry ent = readResource(parser, date);
                 parser.next();
                 if (ent != null) {
-                    entries.put(ent.symbol, ent);
+                    entries.put(ent.symbol(), ent);
                 }
             } else {
                 skip(parser);

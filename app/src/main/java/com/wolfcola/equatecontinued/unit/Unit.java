@@ -156,8 +156,7 @@ public abstract class Unit  /*implements JsonSerializer<Unit>, JsonDeserializer<
         if (other == null) return false;
         if (other == this) return true;  //if objects are pointing to the same ref
         //now check if a cast into Unit is possible and then check compatibility
-        if (!(other instanceof Unit)) return false;
-        Unit otherUnit = (Unit) other;
+        if (!(other instanceof Unit otherUnit)) return false;
         return (otherUnit.getValue() == this.getValue() &&
                 otherUnit.toString().equals(this.toString()));
     }

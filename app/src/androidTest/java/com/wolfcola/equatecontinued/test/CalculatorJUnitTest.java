@@ -28,11 +28,11 @@ public class CalculatorJUnitTest {
     public static final int INT_DISPLAY_PRECISION = 15;
     public static final int INT_CALC_PRECISION = INT_DISPLAY_PRECISION + 2;
     public String[] allKeyArray = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "+", "-", "*", "/", "b", "E", "="};
-    private MathContext mcDisp = new MathContext(INT_DISPLAY_PRECISION);
+    private final MathContext mcDisp = new MathContext(INT_DISPLAY_PRECISION);
     private Calculator bruteCalc;
-    private String[] someKeyArray = {"0", "9", ".", "+", "-", "*", "/", "b", "E", "="};
+    private final String[] someKeyArray = {"0", "9", ".", "+", "-", "*", "/", "b", "E", "="};
     //these configure the testing
-    private String[] testKeyArray = someKeyArray;
+    private final String[] testKeyArray = someKeyArray;
 
     /**
      * Returns a test Calculator instance with a mocked Resources object.
@@ -289,7 +289,7 @@ public class CalculatorJUnitTest {
         assertEquals("162", calc.toString());
         //test lots of decimals
         loadStringToCalc("4.3^.3=", calc);
-        BigDecimal bd = new BigDecimal(1.5489611908722423119058589800223, mcDisp);
+        BigDecimal bd = new BigDecimal("1.5489611908722423119058589800223", mcDisp);
         assertTrue(calc.toString().matches(bd.toString()));
         //test large numbers
         loadStringToCalc("9.1^500=", calc);

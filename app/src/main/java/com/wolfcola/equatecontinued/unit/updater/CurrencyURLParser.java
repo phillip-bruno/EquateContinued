@@ -80,15 +80,6 @@ public abstract class CurrencyURLParser {
         }
     }
 
-    static class Entry {
-        final double price;
-        final String symbol;
-        final Date date;
-
-        Entry(double price, String symbol, Date date) {
-            this.price = price;
-            this.symbol = symbol;
-            this.date = date;
-        }
+    record Entry(double price, String symbol, Date date) {
     }
 }

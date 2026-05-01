@@ -34,12 +34,11 @@ public class SettingsActivity extends AppCompatActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
+    private static final Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
             (preference, value) -> {
                 String stringValue = value.toString();
 
-                if (preference instanceof ListPreference) {
-                    ListPreference listPreference = (ListPreference) preference;
+                if (preference instanceof ListPreference listPreference) {
                     int index = listPreference.findIndexOfValue(stringValue);
                     preference.setSummary(
                             index >= 0

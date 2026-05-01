@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 
 public class ExpSeparatorHandler {
-    private static String THOUS_SEP = ",";
+    private static final String THOUS_SEP = ",";
 
     public ArrayList<Integer> mSepIndexes;
 
@@ -53,7 +53,7 @@ public class ExpSeparatorHandler {
                         if (j == 0) continue;
                         int comPos = i - numCount + j;
                         str = str.substring(0, comPos) + THOUS_SEP
-                                + str.substring(comPos, str.length());
+                                + str.substring(comPos);
                         if (indList != null) indList.add(comPos);
                         i++; //offset for added commas
                     }

@@ -58,7 +58,7 @@ public class ButtonManager {
         Button equalsButton = null;
 
         for (int id : BUTTON_IDS) {
-            final Button button = (Button) activity.findViewById(id);
+            final Button button = activity.findViewById(id);
 
             if (id == R.id.equals_button) equalsButton = button;
 
@@ -110,8 +110,7 @@ public class ButtonManager {
                 return true;
             });
 
-            if (button instanceof AnimatedHoldButton) {
-                final AnimatedHoldButton ahb = (AnimatedHoldButton) button;
+            if (button instanceof AnimatedHoldButton ahb) {
                 ahb.setOnExtraLongClickListener(view -> {
                     int buttonId = view.getId();
                     if (buttonId == R.id.percent_button) {
@@ -155,7 +154,7 @@ public class ButtonManager {
     }
 
     private static void setupBackspaceHold(Activity activity, Callback callback) {
-        ImageButton backspaceButton = (ImageButton) activity.findViewById(R.id.backspace_button);
+        ImageButton backspaceButton = activity.findViewById(R.id.backspace_button);
         final Drawable normalDrawable = backspaceButton.getBackground();
         backspaceButton.setOnTouchListener(new View.OnTouchListener() {
             private static final int NUM_COLOR_CHANGES = 10;
@@ -165,9 +164,9 @@ public class ButtonManager {
             private View mView;
             private int mInc;
 
-            Runnable mBackspaceColor = new Runnable() {
-                private int mStartColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorPrimaryContainer, 0);
-                private int mEndColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorError, 0);
+            final Runnable mBackspaceColor = new Runnable() {
+                private final int mStartColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorPrimaryContainer, 0);
+                private final int mEndColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorError, 0);
 
                 @Override
                 public void run() {

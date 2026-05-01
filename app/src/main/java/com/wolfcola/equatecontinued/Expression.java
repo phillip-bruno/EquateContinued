@@ -45,8 +45,8 @@ public class Expression {
     private boolean mSolved;
     private NumFormat mNumFormat = NumFormat.NORMAL;
     //list of indexes of characters to highlight
-    private ArrayList<Integer> mHighlightedCharList;
-    private String[][] substituteChars = new String[][]{{"[\u00f7\u00B7]", "/"}, //alt-246
+    private final ArrayList<Integer> mHighlightedCharList;
+    private final String[][] substituteChars = new String[][]{{"[\u00f7\u00B7]", "/"}, //alt-246
             {"[x\u00d7]", "*"},//alt-0215,249,250
             {"[\u0096\u0097]", "-"}}; //alt-0151,0150
 
@@ -152,14 +152,14 @@ public class Expression {
                 }
                 //second case is just #^
                 else {
-                    String firstNum = getFirstNumb(str.substring(i + 1, str.length()));
+                    String firstNum = getFirstNumb(str.substring(i + 1));
                     closePareIndex = i + 1 + firstNum.length();
                 }
 
                 //actually add in pares
                 str = str.substring(0, openPareIndex)
                         + "(" + str.substring(openPareIndex, closePareIndex) + ")"
-                        + str.substring(closePareIndex, str.length());
+                        + str.substring(closePareIndex);
                 //advanced index beyond ^#)
                 i = closePareIndex;
             }
@@ -182,9 +182,9 @@ public class Expression {
                 //trim off the last number
                 subStr = subStr.substring(0, subStr.length() - lastNum.length());
                 //as long as the string isn't empty, find last operator
-                strAfter = str.substring(i + 1, str.length());
+                strAfter = str.substring(i + 1);
                 if (!subStr.equals("")) {
-                    String lastOp = subStr.substring(subStr.length() - 1, subStr.length());
+                    String lastOp = subStr.substring(subStr.length() - 1);
                     //trim off the last operator
                     subStr = subStr.substring(0, subStr.length() - 1);
                     //case similar to 2+5% or 2-5%, but no 2+5%3 or 2+5%*3
@@ -496,11 +496,9 @@ public class Expression {
             return false;
 
         //don't allow two %'s in a row, or "5%*" then another "%"
-        if (sKey.matches("%") && expressionToSelection().matches(".*%" + regexAnyValidOperator + "?$"))
-            return false;
+        return !sKey.matches("%") || !expressionToSelection().matches(".*%" + regexAnyValidOperator + "?$");
 
         //no problems, return valid entry
-        return true;
     }
 
     /**
@@ -787,7 +785,7 @@ public class Expression {
 
         //if we had 5+-6, remove the - before the 6
         if (lastNum.matches("[-].*")) {
-            endStr = endStr + lastNum.substring(1, lastNum.length());
+            endStr = endStr + lastNum.substring(1);
         }
         //add in a minus and the shorten unnecessary signs
         else {

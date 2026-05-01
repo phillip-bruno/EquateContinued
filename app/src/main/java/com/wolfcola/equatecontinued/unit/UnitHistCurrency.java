@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class UnitHistCurrency extends Unit {
-    private static String GENERIC_PREFIX = "Historical ";
-    private static String GENERIC_SUFFIX = " (CPI)";
+    private static final String GENERIC_PREFIX = "Historical ";
+    private static final String GENERIC_SUFFIX = " (CPI)";
 
-    private String mNamePrefix;
-    private String mLongNamePrefix;
+    private final String mNamePrefix;
+    private final String mLongNamePrefix;
 
     private int mYearIndex = 0;
     //used when we want to convert from this unit to this unit again (different year)
     private int mPreviousYearIndex = 0;
-    private int mStartYearOffset;
-    private ArrayList<Double> mHistoricalValueArray;
+    private final int mStartYearOffset;
+    private final ArrayList<Double> mHistoricalValueArray;
 
 
     public UnitHistCurrency(String name, String longName, ArrayList<Double> values,

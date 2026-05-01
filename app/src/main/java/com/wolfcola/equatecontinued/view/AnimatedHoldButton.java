@@ -29,8 +29,8 @@ public class AnimatedHoldButton extends SecondaryTextButton {
     private Handler mColorHoldHandler;
     private boolean mLongClickPerformed = false;
     private boolean mWaitingForExtraLongClick = false;
-    private Drawable mNormalDrawable;
-    private int mPressedColor;
+    private final Drawable mNormalDrawable;
+    private final int mPressedColor;
 
     //used to count up holding time
     private int mHoldInc;

@@ -40,7 +40,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     private ArrayList<Button> mConvButton;
     private Button mMoreButton;
     private int mNumConvButtons;
-    private int[] convertButtonIds = {
+    private final int[] convertButtonIds = {
             R.id.convert_button1,
             R.id.convert_button2,
             R.id.convert_button3,
@@ -119,7 +119,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
 
         for (int i = 0; i < mNumConvButtons; i++) {
-            Button button = (Button) v.findViewById(convertButtonIds[i]);
+            Button button = v.findViewById(convertButtonIds[i]);
 
             //add ellipses for long press
             if (mUnitType.size() > mNumConvButtons)

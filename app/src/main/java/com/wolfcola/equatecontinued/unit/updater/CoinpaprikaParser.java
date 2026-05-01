@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class CoinpaprikaParser extends CurrencyURLParser {
     HashMap<String, Entry> parse(InputStream stream) throws CurrencyParseException {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    stream, Charset.forName("UTF-8")));
+                    stream, StandardCharsets.UTF_8));
 
             String jsonText = readAll(reader);
             JSONArray jArray = new JSONArray(jsonText);
@@ -69,8 +70,7 @@ public class CoinpaprikaParser extends CurrencyURLParser {
         for (int i = 0; i < jArray.length(); i++) {
             Object obj = jArray.get(i);
 
-            if (obj instanceof JSONObject) {
-                JSONObject jObj = (JSONObject) obj;
+            if (obj instanceof JSONObject jObj) {
                 String symbol = jObj.getString("symbol");
                 String last_updated = jObj.getString("last_updated");
 

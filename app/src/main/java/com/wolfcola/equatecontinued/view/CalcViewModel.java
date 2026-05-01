@@ -90,13 +90,6 @@ public class CalcViewModel extends AndroidViewModel {
         mSelectUnitEvent.setValue(new UnitSelectEvent(unitPos, unitTypeKey));
     }
 
-    public static class UnitSelectEvent {
-        public final int unitPos;
-        public final String unitTypeKey;
-
-        public UnitSelectEvent(int unitPos, String unitTypeKey) {
-            this.unitPos = unitPos;
-            this.unitTypeKey = unitTypeKey;
-        }
+    public record UnitSelectEvent(int unitPos, String unitTypeKey) {
     }
 }

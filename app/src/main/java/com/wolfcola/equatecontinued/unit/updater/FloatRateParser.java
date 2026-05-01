@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class FloatRateParser extends CurrencyURLParser {
      * @throws JSONException if errors occur while reading JSON data
      */
     private JSONObject streamToJSON(InputStream stream) throws IOException, JSONException {
-        BufferedReader streamReader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         StringBuilder responseStrBuilder = new StringBuilder();
 
         String inputStr;

@@ -113,7 +113,7 @@ public class YahooXmlParser extends CurrencyURLParser {
                 }
                 Entry ent = readResource(parser);
                 if (ent != null) {
-                    entries.put(ent.symbol, ent);
+                    entries.put(ent.symbol(), ent);
                 }
             } else {
                 skip(parser);

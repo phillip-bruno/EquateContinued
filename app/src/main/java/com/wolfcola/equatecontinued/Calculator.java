@@ -46,7 +46,7 @@ public class Calculator {
     //object that handles all the math
     private Solver mSolver;
     //string of results; this will be directly manipulated by ResultListFragment
-    private List<Result> mResultList;
+    private final List<Result> mResultList;
     // stores the array of various types of units (length, area, volume, etc)
     // as well as current unit type position
     private UnitTypeList mUnitTypeList;
@@ -106,7 +106,7 @@ public class Calculator {
             toast(message);
             resetCalc(); //reset the calc and we should be good
         } catch (Exception e) {
-            toast("Exception in Calculator.loadState():" + e.toString());
+            toast("Exception in Calculator.loadState():" + e);
         }
     }
 
