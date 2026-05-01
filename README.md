@@ -38,7 +38,12 @@ For a signed release build, supply your keystore via Gradle properties or enviro
 
 ## Releasing
 
-Releases are published automatically by pushing a version tag:
+Releases are published automatically by pushing a version tag.
+
+1) First change the `android:versionCode` and `android:versionName` in
+   `app/src/main/AndroidManifest.xml`
+2) Then change the `res/values/strings.xml` the `whats_new` version code to match the versionName
+   from step 1
 
 ```bash
 git tag v2.3.0
