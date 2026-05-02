@@ -72,7 +72,7 @@ public class CalcActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Enable edge-to-edge display — must be called before setContentView
+        // Enable edge-to-edge display -- must be called before setContentView
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         super.onCreate(savedInstanceState);
@@ -457,7 +457,7 @@ public class CalcActivity extends AppCompatActivity
 
         mResultPreview.setVisibility(makePreviewVisible ? View.VISIBLE : View.GONE);
 
-        updatePreviewText(MaterialColors.getColor(this, com.google.android.material.R.attr.colorPrimary, 0));
+        updatePreviewText(MaterialColors.getColor(this, androidx.appcompat.R.attr.colorPrimary, 0));
 
         //if we hit equals, update result list
         if (updateResult)

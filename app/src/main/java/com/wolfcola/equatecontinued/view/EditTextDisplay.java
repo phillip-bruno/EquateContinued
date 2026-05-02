@@ -90,8 +90,8 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
      */
     public void setupHighlighting() {
         if (mCalc.isHighlighted()) {
-            int colorFrom = MaterialColors.getColor(this, com.google.android.material.R.attr.colorError, 0);
-            int colorTo = MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSurface, 0);
+            int colorFrom = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorError, 0);
+            int colorTo = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorOnSurface, 0);
             final int ANIMATE_DURR = 600; //ms
             mColorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
             mColorAnimation.addUpdateListener(animator -> {

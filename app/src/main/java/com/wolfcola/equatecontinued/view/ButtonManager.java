@@ -165,8 +165,8 @@ public class ButtonManager {
             private int mInc;
 
             final Runnable mBackspaceColor = new Runnable() {
-                private final int mStartColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorPrimaryContainer, 0);
-                private final int mEndColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorError, 0);
+                private final int mStartColor = MaterialColors.getColor(activity, androidx.appcompat.R.attr.colorPrimaryContainer, 0);
+                private final int mEndColor = MaterialColors.getColor(activity, androidx.appcompat.R.attr.colorError, 0);
 
                 @Override
                 public void run() {

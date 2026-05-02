@@ -85,7 +85,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
             if (mGradStartCol == null) {
                 mGradStartCol = mPressedColor;
                 mGradEndCol = MaterialColors.getColor(AnimatedHoldButton.this,
-                        com.google.android.material.R.attr.colorSurface, 0);
+                        androidx.appcompat.R.attr.colorSurface, 0);
                 mAccentColor = mPressedColor;
                 mFinalColor = mPressedColor;
             }
@@ -106,7 +106,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
         try {
             mPrimaryText = ta.getString(R.styleable.AnimatedHoldButton_primary_text);
             mPressedColor = ta.getColor(R.styleable.AnimatedHoldButton_pressed_color,
-                    MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimary, 0));
+                    MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0));
         } finally {
             ta.recycle();
         }
@@ -207,4 +207,3 @@ public class AnimatedHoldButton extends SecondaryTextButton {
         void onExtraLongClick(View var1);
     }
 }
-
