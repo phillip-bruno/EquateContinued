@@ -36,17 +36,48 @@ The debug APK will be at `app/build/outputs/apk/debug/`.
 
 For a signed release build, supply your keystore via Gradle properties or environment variables, see the CI workflow below.
 
-## Releasing
+## Creating a New Release
 
-Releases are published automatically by pushing a version tag:
+### 1. Bump the Version
 
-```bash
-git tag v2.3.0
-git push origin v2.3.0
+Edit **`app/src/main/AndroidManifest.xml`** and increment both version fields:
+
+```xml
+android:versionCode="19"        <!-- increment by 1 each release -->
+android:versionName="2.2.6"     <!-- follow semantic versioning: MAJOR.MINOR.PATCH -->
 ```
 
-The CI workflow will build a signed release APK and AAB, then create a GitHub Release with both files attached and auto-generated release notes from commit messages.
+Edit **`res/values/strings.xml`** and increment the version/release notes:
+```xml
+<string name="whats_new">What is new in v2.2.6</string>
+<string name="version_description">More behind the scene changes.</string>
+```
 
+### 2. Commit the Change
+
+```bash
+git add app/src/main/AndroidManifest.xml
+git commit -m "Bump version to 2.2.6 (versionCode 19)"
+git push origin master
+```
+
+### 3. Tag the Release
+
+The CI/CD pipeline triggers automatically on any tag matching `v*`. Push a tag that matches your `versionName`:
+
+```bash
+git tag v2.2.6
+git push origin v2.2.6
+```
+
+### 4. What Happens Automatically
+
+The [GitHub Actions workflow](.github/workflows/android.yml) will:
+- Build and sign the release APK and AAB
+- Create a GitHub Release at the tag with auto-generated release notes
+- Attach the signed APK and AAB as downloadable artifacts
+
+> **Note:** The signing secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) must be configured in **Settings → Secrets and variables → Actions** for the release build to be signed.
 ### Keystore Setup
 
 The release build requires a signing keystore. Generate one if you don't have one:
