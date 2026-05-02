@@ -85,7 +85,7 @@ public class AnimatedHoldButton extends SecondaryTextButton {
             if (mGradStartCol == null) {
                 mGradStartCol = mPressedColor;
                 mGradEndCol = MaterialColors.getColor(AnimatedHoldButton.this,
-                        androidx.appcompat.R.attr.colorSurface, 0);
+                        com.google.android.material.R.attr.colorSurface, 0);
                 mAccentColor = mPressedColor;
                 mFinalColor = mPressedColor;
             }
