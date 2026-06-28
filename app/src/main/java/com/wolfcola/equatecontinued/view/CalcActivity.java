@@ -78,9 +78,9 @@ public class CalcActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.drawer_layout);
 
-        // Apply system bar insets as padding to the root DrawerLayout so content
+        // Apply system bar insets as padding to the calculator content root so it
         // is never obscured by the status bar or navigation bar.
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.drawer_layout), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.calc_root), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
