@@ -9,6 +9,13 @@
 
 # Add any project specific keep options here:
 
+# Unit model classes are reconstructed from JSON (org.json) and have a
+# reflective load path in Unit.java. Keep them and their JSONObject
+# constructors so code shrinking can never strip them.
+-keep class com.wolfcola.equatecontinued.unit.Unit* {
+    <init>(org.json.JSONObject);
+}
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
