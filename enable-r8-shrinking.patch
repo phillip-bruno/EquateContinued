@@ -1,0 +1,76 @@
+From 4ecc76719a706da86fea6f18d9361f827d5f411c Mon Sep 17 00:00:00 2001
+From: junior-dev <dev@example.com>
+Date: Sun, 28 Jun 2026 19:17:09 +0000
+Subject: [PATCH] Enable R8 code & resource shrinking for release builds
+
+- build.gradle: minifyEnabled + shrinkResources true for release
+- proguard-rules.pro: keep Unit* JSONObject constructors (shrinker safety;
+  -dontobfuscate retained, so no renaming)
+- CI: archive mapping.txt artifact and attach to GitHub Release (tag builds)
+---
+ .github/workflows/android.yml | 9 +++++++++
+ app/build.gradle              | 4 ++--
+ app/proguard-rules.pro        | 7 +++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/.github/workflows/android.yml b/.github/workflows/android.yml
+index 4b608b6..b72d8c2 100644
+--- a/.github/workflows/android.yml
++++ b/.github/workflows/android.yml
+@@ -65,6 +65,14 @@ jobs:
+           name: debug-apk
+           path: app/build/outputs/apk/debug/*.apk
+ 
++      - name: Upload R8 mapping
++        if: startsWith(github.ref, 'refs/tags/v')
++        uses: actions/upload-artifact@v4
++        with:
++          name: mapping
++          path: app/build/outputs/mapping/release/mapping.txt
++          if-no-files-found: warn
++
+       - name: Create GitHub Release
+         if: startsWith(github.ref, 'refs/tags/v')
+         uses: softprops/action-gh-release@v2
+@@ -72,4 +80,5 @@ jobs:
+           files: |
+             app/build/outputs/apk/release/*.apk
+             app/build/outputs/bundle/release/*.aab
++            app/build/outputs/mapping/release/mapping.txt
+           generate_release_notes: true
+diff --git a/app/build.gradle b/app/build.gradle
+index 4dc30c6..a1662e0 100644
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -57,8 +57,8 @@ android {
+     buildTypes {
+         release {
+             signingConfig signingConfigs.release
+-            shrinkResources false
+-            minifyEnabled false
++            shrinkResources true
++            minifyEnabled true
+             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                     'proguard-rules.pro'
+         }
+diff --git a/app/proguard-rules.pro b/app/proguard-rules.pro
+index 36e4a51..11fc3bc 100644
+--- a/app/proguard-rules.pro
++++ b/app/proguard-rules.pro
+@@ -9,6 +9,13 @@
+ 
+ # Add any project specific keep options here:
+ 
++# Unit model classes are reconstructed from JSON (org.json) and have a
++# reflective load path in Unit.java. Keep them and their JSONObject
++# constructors so code shrinking can never strip them.
++-keep class com.wolfcola.equatecontinued.unit.Unit* {
++    <init>(org.json.JSONObject);
++}
++
+ # If your project uses WebView with JS, uncomment the following
+ # and specify the fully qualified class name to the JavaScript interface
+ # class:
+-- 
+2.43.0
+
