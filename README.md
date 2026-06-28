@@ -43,13 +43,13 @@ For a signed release build, supply your keystore via Gradle properties or enviro
 Edit **`app/src/main/AndroidManifest.xml`** and increment both version fields:
 
 ```xml
-android:versionCode="19"        <!-- increment by 1 each release -->
-android:versionName="2.2.6"     <!-- follow semantic versioning: MAJOR.MINOR.PATCH -->
+android:versionCode="20"        <!-- increment by 1 each release -->
+android:versionName="2.2.9"     <!-- follow semantic versioning: MAJOR.MINOR.PATCH -->
 ```
 
 Edit **`res/values/strings.xml`** and increment the version/release notes:
 ```xml
-<string name="whats_new">What is new in v2.2.6</string>
+<string name="whats_new">What is new in v2.2.9</string>
 <string name="version_description">More behind the scene changes.</string>
 ```
 
@@ -57,7 +57,7 @@ Edit **`res/values/strings.xml`** and increment the version/release notes:
 
 ```bash
 git add app/src/main/AndroidManifest.xml
-git commit -m "Bump version to 2.2.6 (versionCode 19)"
+git commit -m "Bump version to 2.2.9 (versionCode 20)"
 git push origin master
 ```
 
@@ -66,8 +66,8 @@ git push origin master
 The CI/CD pipeline triggers automatically on any tag matching `v*`. Push a tag that matches your `versionName`:
 
 ```bash
-git tag v2.2.6
-git push origin v2.2.6
+git tag v2.2.9
+git push origin v2.2.9
 ```
 
 ### 4. What Happens Automatically
