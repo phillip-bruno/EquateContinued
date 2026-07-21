@@ -47,7 +47,7 @@ android:versionCode="20"        <!-- increment by 1 each release -->
 android:versionName="2.2.9"     <!-- follow semantic versioning: MAJOR.MINOR.PATCH -->
 ```
 
-Edit **`res/values/strings.xml`** and increment the version/release notes:
+Edit **`app/src/main/res/values/strings.xml`** and increment the version/release notes:
 ```xml
 <string name="whats_new">What is new in v2.2.9</string>
 <string name="version_description">More behind the scene changes.</string>
