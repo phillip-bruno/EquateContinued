@@ -57,7 +57,8 @@ Edit **`app/src/main/res/values/strings.xml`** and increment the version/release
 
 ```bash
 git add app/src/main/AndroidManifest.xml
-git commit -m "Bump version to 2.2.9 (versionCode 20)"
+git add app/src/main/res/values/strings.xml
+git commit -m "Bump version to 2.2.XX (versionCode XX)"
 git push origin master
 ```
 
@@ -66,8 +67,8 @@ git push origin master
 The CI/CD pipeline triggers automatically on any tag matching `v*`. Push a tag that matches your `versionName`:
 
 ```bash
-git tag v2.2.9
-git push origin v2.2.9
+git tag v2.2.XX
+git push origin v2.2.XX
 ```
 
 ### 4. What Happens Automatically
