@@ -102,8 +102,8 @@
     <string name="find_unit">Find Unit</string>
     <string name="find_unit_hint">Find unit:</string>
 
-    <string name="whats_new">What is new in v2.2.12</string>
-    <string name="version_description">Behind the hood fix.</string>
+    <string name="whats_new">What is new in v2.2.13</string>
+    <string name="version_description">Crash fix.</string>
 
     <!-- Unit Names -->
     <!--These names should not get translated, they're used internally only-->
