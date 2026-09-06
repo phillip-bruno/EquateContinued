@@ -9,6 +9,7 @@ import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.text.InputType;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 
 import androidx.core.content.ContextCompat;
 
@@ -21,7 +22,7 @@ import java.util.Objects;
 
 public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText {
     private Calculator mCalc;
-    private float mTextSize = 0f;
+    private float mOriginalTextSize = 0f;
     private float mMinTextSize;
     private int mSelStart = 0;
     private int mSelEnd = 0;
@@ -171,19 +172,36 @@ public class EditTextDisplay extends androidx.appcompat.widget.AppCompatEditText
      * Helper method to size text
      */
     private void layoutText() {
-        Paint paint = getPaint();
-        if (mTextSize != 0f) paint.setTextSize(mTextSize);
+        // Remember the size the view started with (from XML) so repeated
+        // calls always scale down from the same baseline instead of
+        // compounding a previous shrink.
+        if (mOriginalTextSize == 0f)
+            mOriginalTextSize = getTextSize();
         //if min text size is the same as normal size, just leave
-        if (mMinTextSize == getTextSize()) return;
-        float textWidth = paint.measureText(Objects.requireNonNull(getText()).toString());
+        if (mMinTextSize == mOriginalTextSize) return;
+
         float boxWidth = getWidth() - getPaddingLeft() - getPaddingRight();
-        float textSize = getTextSize();
+        if (boxWidth <= 0f) return;
+
+        // Measure with a throwaway copy of the paint at the original size so
+        // we don't disturb the view's own paint/layout while probing.
+        Paint measurePaint = new Paint(getPaint());
+        measurePaint.setTextSize(mOriginalTextSize);
+        float textWidth = measurePaint.measureText(Objects.requireNonNull(getText()).toString());
+
+        float targetSize = mOriginalTextSize;
         if (textWidth > boxWidth) {
-            float scaled = textSize * boxWidth / textWidth;
-            if (scaled < mMinTextSize)
-                scaled = mMinTextSize;
-            paint.setTextSize(scaled);
-            mTextSize = textSize;
+            targetSize = mOriginalTextSize * boxWidth / textWidth;
+            if (targetSize < mMinTextSize)
+                targetSize = mMinTextSize;
+        }
+
+        if (getTextSize() != targetSize) {
+            // Use the real setTextSize() API (not paint.setTextSize()) so the
+            // view rebuilds its internal layout/line-height for the new size
+            // instead of drawing smaller glyphs inside line spacing that was
+            // measured for the original (larger) size.
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, targetSize);
         }
     }
 
