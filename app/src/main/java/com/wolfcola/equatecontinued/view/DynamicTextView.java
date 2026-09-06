@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.widget.TextView;
 
 import com.wolfcola.equatecontinued.R;
@@ -14,7 +15,7 @@ import com.wolfcola.equatecontinued.R;
  * XML.  Created by Evan on 12/10/2016.
  */
 public class DynamicTextView extends androidx.appcompat.widget.AppCompatTextView {
-    private float mTextSize = 0f;
+    private float mOriginalTextSize = 0f;
     private float mMinTextSize;
 
     public DynamicTextView(Context context) {
@@ -64,23 +65,39 @@ public class DynamicTextView extends androidx.appcompat.widget.AppCompatTextView
      */
     private void layoutText() {
         if (getText().equals("")) return;
-        Paint paint = getPaint();
-        if (mTextSize != 0f)
-            paint.setTextSize(mTextSize);
+
+        // Remember the size the view started with (from XML) so repeated
+        // calls always scale down from the same baseline instead of
+        // compounding a previous shrink.
+        if (mOriginalTextSize == 0f)
+            mOriginalTextSize = getTextSize();
         //if min text size is the same as normal size, just leave
-        if (mMinTextSize == getTextSize()) return;
-        float textWidth = paint.measureText(getText().toString());
+        if (mMinTextSize == mOriginalTextSize) return;
+
         float boxWidth = getWidth() - getPaddingLeft() - getPaddingRight();
         // if the view doesn't exist, the box width will be 0 or negative
         if (boxWidth <= 0f) return;
-        float textSize = getTextSize();
+
+        // Measure with a throwaway copy of the paint at the original size so
+        // we don't disturb the TextView's own paint/layout while probing.
+        Paint measurePaint = new Paint(getPaint());
+        measurePaint.setTextSize(mOriginalTextSize);
+        float textWidth = measurePaint.measureText(getText().toString());
+
+        float targetSize = mOriginalTextSize;
         if (textWidth > boxWidth) {
-            float scaled = textSize * boxWidth / textWidth;
-            //scaled = scaled*0.9f;
-            if (scaled < mMinTextSize)
-                scaled = mMinTextSize;
-            paint.setTextSize(scaled);
-            mTextSize = textSize;
+            targetSize = mOriginalTextSize * boxWidth / textWidth;
+            if (targetSize < mMinTextSize)
+                targetSize = mMinTextSize;
+        }
+
+        if (getTextSize() != targetSize) {
+            // Use the real setTextSize() API (not paint.setTextSize()) so the
+            // TextView rebuilds its internal layout/line-height for the new
+            // size, instead of drawing smaller glyphs inside line spacing
+            // that was measured for the original (larger) size - which is
+            // what left the stale blank gap above the text.
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, targetSize);
         }
     }
 }
