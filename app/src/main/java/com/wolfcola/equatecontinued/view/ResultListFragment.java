@@ -42,7 +42,11 @@ public class ResultListFragment extends Fragment {
         mResultArray = mViewModel.getCalc().getResultList();
 
         mRecyclerView = view.findViewById(R.id.result_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        // Stack from the end so a short history sits against the bottom of the
+        // list, directly above the live expression, instead of leaving a gap there.
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(layoutManager);
         mAdapter = new ResultAdapter();
         mRecyclerView.setAdapter(mAdapter);
     }
