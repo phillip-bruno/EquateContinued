@@ -102,7 +102,7 @@
     <string name="find_unit">Find Unit</string>
     <string name="find_unit_hint">Find unit:</string>
 
-    <string name="whats_new">What is new in v2.2.16</string>
+    <string name="whats_new">What is new in v2.2.17</string>
     <string name="version_description">Fixes scientific notation in some languages, adds inflation data through 2025, and includes general bug fixes and cleanup.</string>
 
     <!-- Unit Names -->
