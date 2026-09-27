@@ -172,7 +172,8 @@ public class ResultListFragment extends Fragment {
                     mResultArray.remove(pos);
                     notifyItemRemoved(pos);
                     mViewModel.requestScreenUpdate(true);
-                    return false;
+                    //consume the event so the release doesn't also fire a click
+                    return true;
                 };
 
                 queryText.setOnLongClickListener(longClickListener);

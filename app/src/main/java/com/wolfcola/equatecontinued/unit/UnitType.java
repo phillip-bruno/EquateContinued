@@ -262,23 +262,9 @@ public class UnitType {
         return getUnit(pos).isDynamic();
     }
 
-//	/** Check to see if unit at position pos is currently updating */
-//	public boolean isUnitUpdating(int pos){
-//		//TODO have this return true if isUpdating is true, otherwise do the following
-//		//TODO also make convert keys reflect this change (so all will show updating)
-//		//TODO but once yahoo xml update is finished, individuals will show updating
-//		if(getUnit(pos).isDynamic())
-//			return ((UnitCurrency)getUnit(pos)).isUpdating();
-//		else
-//			return false;
-//	}
-
     public void setDynamicUnitCallback(OnConvertKeyUpdateFinishedListener callback) {
         if (containsDynamicUnits()) {
             mCallback = callback;
-//			for (int i = 0; i < size(); i++)
-//				if (getUnit(i).isDynamic())
-//					((UnitCurrency) getUnit(i)).setCallback(mCallback);
         }
     }
 

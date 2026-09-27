@@ -1,6 +1,5 @@
 package com.wolfcola.equatecontinued.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,9 +13,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.unit.UnitHistCurrency;
@@ -198,7 +199,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
                                        DialogInterface.OnClickListener itemClickListener,
                                        DialogInterface.OnClickListener customClickListener) {
         Context context = getActivity();
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(context);
         builder.setTitle(title);
         builder.setItems(mUnitType.getUndisplayedUnitNames(mNumConvButtons), itemClickListener);
         builder.setNegativeButton(android.R.string.cancel, null);
@@ -226,8 +227,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     }
 
     private void createCustomUnitDialog() {
-        AlertDialog.Builder builder = new AlertDialog.
-                Builder(getActivity());
+        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(getActivity());
         builder.setTitle("Create New Unit:");
 
         Context context = getActivity();
@@ -308,8 +308,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
         //pop open selection dialog for historical units
         if (mUnitType.isUnitHistorical(buttonPos)) {
             UnitHistCurrency uhc = (UnitHistCurrency) mUnitType.getUnit(buttonPos);
-            AlertDialog.Builder builder = new AlertDialog.
-                    Builder(getActivity());
+            AlertDialog.Builder builder = new MaterialAlertDialogBuilder(getActivity());
             builder.setTitle(getText(R.string.historical_dialog_title));
             builder.setSingleChoiceItems(uhc.getPossibleYearsReversed(), uhc.getReversedYearIndex(),
                     (dialog, item) -> {

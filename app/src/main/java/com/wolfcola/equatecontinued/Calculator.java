@@ -247,7 +247,7 @@ public class Calculator {
                     return resultFlags;
                 }
                 // Display sci/engineering notation if expression is just a number
-                boolean togglePerformed = mSolver.tryToggleSciNote(mExpression, false);
+                boolean togglePerformed = mSolver.tryToggleSciNote(mExpression);
 
                 if (togglePerformed) {
                     // in case this toggle was performed after operation, remove

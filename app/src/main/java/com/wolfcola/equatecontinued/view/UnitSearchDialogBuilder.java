@@ -1,6 +1,5 @@
 package com.wolfcola.equatecontinued.view;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.text.Editable;
@@ -15,7 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.unit.Unit;
 import com.wolfcola.equatecontinued.unit.UnitType;
@@ -105,7 +106,7 @@ public class UnitSearchDialogBuilder {
     public void buildDialog(Context context, CharSequence hint,
                             @Nullable final SimpleIdlingResource idlingResource,
                             AdapterView.OnItemClickListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new MaterialAlertDialogBuilder(context);
 
         final EditText filterEditText = new EditText(context);
         final ListView listView = new ListView(context);

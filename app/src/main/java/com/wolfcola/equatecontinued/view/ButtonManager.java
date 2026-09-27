@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -196,11 +197,12 @@ public class ButtonManager {
                         mInc = 0;
 
                         if (mColorHoldHandler != null) return true;
-                        mColorHoldHandler = new Handler();
+                        mColorHoldHandler = new Handler(Looper.getMainLooper());
                         mColorHoldHandler.postDelayed(mBackspaceColor, COLOR_CHANGE_PERIOD);
 
                         break;
                     case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
                         if (mColorHoldHandler == null) return true;
                         view.setBackground(normalDrawable);
 

@@ -2,8 +2,10 @@ package com.wolfcola.equatecontinued.unit.updater;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.unit.Unit;
@@ -13,24 +15,27 @@ import com.wolfcola.equatecontinued.unit.updater.CurrencyURLParser.CurrencyParse
 import com.wolfcola.equatecontinued.view.ViewUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
  * Helper class is used to update dynamic unit types such as currency by
- * calling all the necessary async tasks and such
+ * fetching the latest rates on a background thread
  * Created by Evan on 10/2/2015.
  */
 public class UnitUpdater {
     private static final int UPDATE_TIMEOUT_MIN = 90;
-    private final Context mContext;
-    private final ArrayList<Integer> mUnitsToUpdate;
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
-    public UnitUpdater(Context mContext) {
-        this.mContext = mContext;
-        mUnitsToUpdate = new ArrayList<>();
+    //application context, so a rotation mid-update doesn't leak the activity
+    private final Context mContext;
+
+    public UnitUpdater(Context context) {
+        mContext = context.getApplicationContext();
     }
 
     /**
@@ -46,9 +51,10 @@ public class UnitUpdater {
             ut.setUpdating(true);
             // perform the unit update using a separate thread so UI thread
             // doesn't get bogged down
-            new UpdateCurrenciesAsyncTask(ut, forced, mUnitsToUpdate, mContext)
-                    .execute();
-
+            EXECUTOR.execute(() -> {
+                ErrorCause error = isNetworkAvailable() ? updateRates(ut) : ErrorCause.NO_INTERNET;
+                MAIN_HANDLER.post(() -> onUpdateFinished(ut, forced, error));
+            });
         } else {
             ViewUtils.toast(mContext.getText(R.string.words_units_up_to_date)
                     .toString(), mContext);
@@ -67,220 +73,109 @@ public class UnitUpdater {
     }
 
     /**
-     * This class is used to create a background task that handles
-     * the actual retrieval of the Yahoo XML file that contains the current rates
+     * Runs on the main thread once the background update completes
+     *
+     * @param error null if the update succeeded
      */
-    private static class UpdateCurrenciesAsyncTask extends AsyncTask<Void, Void, Boolean> {
-        private final Context mContext;
-        private final UnitType mUnitType;
-        private final ArrayList<Integer> mUnitsToUpdate;
-        private final Boolean mForced;
-        private ErrorCause mErrorCause;
-        /**
-         * Constructor to create a new Asynchronous task used to update currencies
-         */
-        UpdateCurrenciesAsyncTask(UnitType unitType, Boolean forced,
-                                  ArrayList<Integer> unitsToUpdate,
-                                  Context context) {
-            mUnitType = unitType;
-            mForced = forced;
-            mUnitsToUpdate = unitsToUpdate;
-            mContext = context;
+    private void onUpdateFinished(UnitType ut, boolean forced, ErrorCause error) {
+        if (error == null) {
+            ut.setLastUpdateTime(new Date());
+            CharSequence text = mContext.getText(R.string.update_at);
+            if (forced) text = mContext.getText(R.string.update_forced);
+            ViewUtils.toastLong(text + ut.getLastUpdateTime().toString(), mContext);
+        } else {
+            // something went wrong with the update, toast the user more info
+            switch (error) {
+                case NO_INTERNET:
+                    ViewUtils.toastLong(R.string.update_error_internet, mContext);
+                    break;
+                case PARSING_ERROR:
+                    ViewUtils.toastLong(R.string.update_error_parsing, mContext);
+                    break;
+                case TIMEOUT:
+                    ViewUtils.toastLong(R.string.update_error_timeout, mContext);
+                    break;
+                default:
+                    ViewUtils.toastLong(R.string.update_error_unknown, mContext);
+                    break;
+            }
         }
 
-        /**
-         * The main method that runs asynchronously
-         */
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            if (!isNetworkAvailable()) {
-                mErrorCause = ErrorCause.NO_INTERNET;
-                return false;
-            }
-            return updateRates(mUnitType);
-        }
-
-        /**
-         * This method is called after doInBackground completes
-         */
-        @Override
-        protected void onPostExecute(Boolean successful) {
-            if (successful) {
-                mUnitType.setLastUpdateTime(new Date());
-                CharSequence text = mContext.getText(R.string.update_at);
-                if (mForced) text = mContext.getText(R.string.update_forced);
-                ViewUtils.toastLong(text + mUnitType.getLastUpdateTime().toString(),
-                        mContext);
-            } else {
-                // something went wrong with the update, toast the user more info
-                switch (mErrorCause) {
-                    case NO_INTERNET:
-                        ViewUtils.toastLong(R.string.update_error_internet, mContext);
-                        break;
-                    case XML_PARSING_ERROR:
-                        ViewUtils.toastLong(R.string.update_error_parsing, mContext);
-                        break;
-                    case TIMEOUT:
-                        ViewUtils.toastLong(R.string.update_error_timeout, mContext);
-                        break;
-                    default:
-                        ViewUtils.toastLong(R.string.update_error_unknown, mContext);
-                        break;
-                }
-            }
-
-//			//update the remaining units that got missed by yahoo xml
-//			if (mUnitsToUpdate != null){
-//				for (int i = 0; i < mUnitsToUpdate.size(); i++) {
-//					UnitCurrency u = (UnitCurrency) mUnitType
-//							  .getUnitPosInUnitArray(mUnitsToUpdate.get(i));
-//					if (u.isTimeoutReached(mContext))
-//						u.asyncRefresh(mContext);
-//				}
-//			}
-
-            //remove text "Updating"
-            mUnitType.setUpdating(false);
-        }
-
-        /**
-         * Method to determine if the the device is connected to the internet
-         *
-         * @return true if the device is connected to the internet, false otherwise
-         */
-        private boolean isNetworkAvailable() {
-            ConnectivityManager connectivityManager
-                    = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
-        }
-
-        /// /			JsonReader reader = null;
-        /// /			try {
-        /// /				reader = new JsonReader(new InputStreamReader(stream, "UTF-8"));
-        /// /			} catch (UnsupportedEncodingException e) {
-        /// /				e.printStackTrace();
-        /// /			}
-//
-//			try {
-//				stream.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			return true;
-//		}
-        private boolean updateRates(UnitType ut) {
-            HashMap<String, CurrencyURLParser.Entry> currRates = null;
-            HashMap<String, CurrencyURLParser.Entry> cryptCurrRates = null;
-
-            // Attempt to retrieve the array of yahoo currency units
-            try {
-                //currRates = new ECBXmlParser().downloadAndParse();
-                currRates = new FloatRateParser().downloadAndParse();
-
-                cryptCurrRates = new CoinpaprikaParser().downloadAndParse();
-
-                // add the two set of rates together, but make sure the normal
-                // currency rates will overwrite the crypto rates when there is a
-                // symbol overlap
-                cryptCurrRates.putAll(currRates);
-                currRates = cryptCurrRates;
-
-            } catch (CurrencyParseException | IOException e) {
-                if (e instanceof CurrencyParseException) {
-                    mErrorCause = ErrorCause.XML_PARSING_ERROR;
-                } else {
-                    mErrorCause = ErrorCause.TIMEOUT;
-                }
-                e.printStackTrace();
-            }
-
-            //leave if we have not updated rates
-            if (currRates == null) return false;
-
-            //update each existing curr with new rates
-            for (int i = 0; i < ut.size(); i++) {
-                //skip unit support that don't support updating (not hist)
-                if (!ut.getUnitPosInUnitArray(i).isDynamic()) continue;
-
-                UnitCurrency u = ((UnitCurrency) ut.getUnitPosInUnitArray(i));
-                CurrencyURLParser.Entry entry = currRates.get(u.getAbbreviation());
-                if (entry != null) {
-                    u.setValue(entry.price());
-                    u.setUpdateDate(entry.date());
-                } else {
-                    //this is for BTC and other units that don't get updated by yahoo
-                    mUnitsToUpdate.add(i);
-                }
-            }
-
-            //TODO inefficient to loop over UnitType twice. instead store fractional
-            //TODO currencies in a separate array in UnitType perhaps?
-            //update each fractional currency with new rates
-            for (int i = 0; i < ut.size(); i++) {
-                Unit unit = ut.getUnitPosInUnitArray(i);
-                if (unit.isDynamic()) {
-                    UnitCurrency uc = (UnitCurrency) unit;
-                    if (uc.isFractionCurrency()) {
-                        UnitCurrency parent = (UnitCurrency) ut.getUnit(uc.getFractionParent());
-                        double parentValue = ut.getUnit(uc.getFractionParent()).getValue();
-                        uc.updateFractionalValue(parentValue);
-                        uc.setUpdateDate(parent.getUpdateDate());
-                    }
-                }
-            }
-            return true;
-        }
-
-
-//
-//		private boolean updateCryptoCurrencies(UnitType ut) {
-//			String URL = ut.getCryptoCurrencyURL();
-//
-//			//only try to update currencies if we have crypto currency URL to work with
-//			if (URL == null) return false;
-//
-//			InputStream stream = null;
-//
-//			// Attempt to retrieve the JSON object of crypto currencies
-//			try {
-//				stream = downloadUrl(URL);
-//			} catch (IOException e) {
-//				mErrorCause = ErrorCause.TIMEOUT;
-//				e.printStackTrace();
-//			}
-//
-//			try {
-//				BufferedReader reader = new BufferedReader(new InputStreamReader(
-//						  stream, "UTF-8"), 8);
-//
-//				StringBuilder sBuilder = new StringBuilder();
-//
-//				String line = null;
-//				while ((line = reader.readLine()) != null) {
-//					sBuilder.append(line + "\n");
-//				}
-//
-//				String result = sBuilder.toString();
-//
-//				try {
-//					JSONObject jObj = new JSONObject(result);
-//					JSONObject btcJSON = jObj.getJSONObject("btc");
-//					String name = btcJSON.getString("name");
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-//
-//
-//
-//			} catch (UnsupportedEncodingException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//
-//
-
-        private enum ErrorCause {NO_INTERNET, TIMEOUT, XML_PARSING_ERROR}
+        //remove text "Updating"
+        ut.setUpdating(false);
     }
+
+    /**
+     * Method to determine if the the device is connected to the internet
+     *
+     * @return true if the device is connected to the internet, false otherwise
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = mContext.getSystemService(ConnectivityManager.class);
+        if (cm == null) return false;
+        Network network = cm.getActiveNetwork();
+        if (network == null) return false;
+        NetworkCapabilities caps = cm.getNetworkCapabilities(network);
+        return caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+    }
+
+    /**
+     * Download the latest rates and apply them to the currencies in ut.
+     * Runs on a background thread.
+     *
+     * @return null on success, otherwise the reason the update failed
+     */
+    private ErrorCause updateRates(UnitType ut) {
+        HashMap<String, CurrencyURLParser.Entry> currRates;
+
+        try {
+            currRates = new FloatRateParser().downloadAndParse();
+            HashMap<String, CurrencyURLParser.Entry> cryptCurrRates =
+                    new CoinpaprikaParser().downloadAndParse();
+
+            // add the two set of rates together, but make sure the normal
+            // currency rates will overwrite the crypto rates when there is a
+            // symbol overlap
+            cryptCurrRates.putAll(currRates);
+            currRates = cryptCurrRates;
+        } catch (CurrencyParseException e) {
+            e.printStackTrace();
+            return ErrorCause.PARSING_ERROR;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ErrorCause.TIMEOUT;
+        }
+
+        //update each existing curr with new rates
+        for (int i = 0; i < ut.size(); i++) {
+            //skip unit support that don't support updating (not hist)
+            if (!ut.getUnitPosInUnitArray(i).isDynamic()) continue;
+
+            UnitCurrency u = ((UnitCurrency) ut.getUnitPosInUnitArray(i));
+            CurrencyURLParser.Entry entry = currRates.get(u.getAbbreviation());
+            if (entry != null) {
+                u.setValue(entry.price());
+                u.setUpdateDate(entry.date());
+            }
+        }
+
+        //TODO inefficient to loop over UnitType twice. instead store fractional
+        //TODO currencies in a separate array in UnitType perhaps?
+        //update each fractional currency with new rates
+        for (int i = 0; i < ut.size(); i++) {
+            Unit unit = ut.getUnitPosInUnitArray(i);
+            if (unit.isDynamic()) {
+                UnitCurrency uc = (UnitCurrency) unit;
+                if (uc.isFractionCurrency()) {
+                    UnitCurrency parent = (UnitCurrency) ut.getUnit(uc.getFractionParent());
+                    double parentValue = ut.getUnit(uc.getFractionParent()).getValue();
+                    uc.updateFractionalValue(parentValue);
+                    uc.setUpdateDate(parent.getUpdateDate());
+                }
+            }
+        }
+        return null;
+    }
+
+    private enum ErrorCause {NO_INTERNET, TIMEOUT, PARSING_ERROR}
 }
