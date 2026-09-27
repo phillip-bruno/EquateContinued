@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -134,12 +135,14 @@ public class AnimatedHoldButton extends SecondaryTextButton {
                 mHoldInc = 0;
 
                 if (mColorHoldHandler != null) return true;
-                mColorHoldHandler = new Handler();
+                mColorHoldHandler = new Handler(Looper.getMainLooper());
                 mColorHoldHandler.postDelayed(mColorRunnable, 10);
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
                 if (mColorHoldHandler == null) return true;
-                if (!mLongClickPerformed)
+                //a cancelled touch (eg drawer swipe) shouldn't count as a click
+                if (!mLongClickPerformed && event.getAction() == MotionEvent.ACTION_UP)
                     clickButton();
 
                 mLongClickPerformed = false;

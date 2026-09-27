@@ -39,7 +39,7 @@ public class UnitHistCurrency extends Unit {
     }
 
     /**
-     * Index value 0 corresponds to 2018, 1 to 2017 etc
+     * Index value 0 corresponds to the most recent year in the table, 1 to the year before, etc
      */
     public void setYearIndexReversed(int reversedIndex) {
         setYearIndex(mHistoricalValueArray.size() - 1 - reversedIndex);

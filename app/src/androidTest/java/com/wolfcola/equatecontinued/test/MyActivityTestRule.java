@@ -95,8 +95,8 @@ class MyActivityTestRule<A extends CalcActivity> extends ActivityTestRule<A> {
 
 
     private record CustomFailureHandle(FailureHandler delegate) implements FailureHandler {
-            private CustomFailureHandle(Context delegate) {
-                this.delegate = new DefaultFailureHandler(delegate);
+            private CustomFailureHandle(Context context) {
+                this(new DefaultFailureHandler(context));
             }
 
             /**

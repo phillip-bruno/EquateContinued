@@ -1,6 +1,5 @@
 package com.wolfcola.equatecontinued.view;
 
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -19,10 +18,13 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.pm.PackageInfoCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -35,6 +37,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
@@ -90,6 +93,7 @@ public class CalcActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        setupDrawerBackHandling();
 
         //initialize ViewModel (survives configuration changes)
         mViewModel = new ViewModelProvider(this).get(CalcViewModel.class);
@@ -281,7 +285,7 @@ public class CalcActivity extends AppCompatActivity
         Calculator.CalculatorResultFlags flags = mCalc.parseKeyPressed(keyPressed);
 
         if (flags.createDiffUnitDialog) {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                     .setMessage(getText(R.string.click_another_unit))
                     .setPositiveButton(android.R.string.ok, null) //null cancels dialog
                     .show();
@@ -295,7 +299,7 @@ public class CalcActivity extends AppCompatActivity
      * Helper function to setup the dialog used to reset the calculator.
      */
     private void resetDialog() {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle(getText(R.string.reset_title))
                 .setItems(new CharSequence[]
                                 {getText(R.string.reset_clear_history), getText(R.string.reset_factory)},
@@ -305,7 +309,7 @@ public class CalcActivity extends AppCompatActivity
                                     clearHistory();
                                     break;
                                 case 1:
-                                    new AlertDialog.Builder(CalcActivity.this)
+                                    new MaterialAlertDialogBuilder(CalcActivity.this)
                                             .setMessage(getText(R.string.reset_factory_msg))
                                             .setPositiveButton(android.R.string.yes, (d, w) -> resetCalculator())
                                             .setNegativeButton(android.R.string.cancel, null)
@@ -359,7 +363,7 @@ public class CalcActivity extends AppCompatActivity
 
         try {
             PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
-            currentVersionNumber = pi.versionCode;
+            currentVersionNumber = (int) PackageInfoCompat.getLongVersionCode(pi);
         } catch (Exception e) {
             android.util.Log.e("CalcActivity", "Failed to get version info", e);
         }
@@ -367,7 +371,7 @@ public class CalcActivity extends AppCompatActivity
         if (currentVersionNumber > savedVersionNumber) {
             LayoutInflater inflater = LayoutInflater.from(this);
             View view = inflater.inflate(R.layout.dialog_whatsnew, null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new MaterialAlertDialogBuilder(this);
 
             builder.setTitle(getText(R.string.whats_new))
                     .setMessage(getText(R.string.version_description))
@@ -545,7 +549,7 @@ public class CalcActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                     .setTitle(getText(R.string.about_title))
                     .setMessage(getText(R.string.about_version) + version +
                             "\n\n" + getText(R.string.about_message))
@@ -558,14 +562,32 @@ public class CalcActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
+    /**
+     * Back closes the nav drawer while it's open, otherwise falls through to
+     * the default behavior
+     */
+    private void setupDrawerBackHandling() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        OnBackPressedCallback closeDrawer = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, closeDrawer);
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                closeDrawer.setEnabled(true);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                closeDrawer.setEnabled(false);
+            }
+        });
+        //drawer may be restored open after a rotation without firing onDrawerOpened
+        drawer.post(() -> closeDrawer.setEnabled(drawer.isDrawerOpen(GravityCompat.START)));
     }
 
     @Override

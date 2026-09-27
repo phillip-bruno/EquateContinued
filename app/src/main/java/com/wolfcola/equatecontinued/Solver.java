@@ -13,6 +13,13 @@ public class Solver {
     public static final String strDivideZeroError = "Divide By Zero Error";
     public static final String strInfinityError = "Number Too Large";
 
+    //operands with a scale below this hang BigDecimal add/subtract (eg 1E999999+1)
+    private static final int MIN_ADD_SCALE = -9000;
+
+    //"# op #" patterns for each order of operations level, compiled once
+    private static final Pattern PTN_EXPONENT = opPattern(Expression.regexGroupedExponent);
+    private static final Pattern PTN_MULT_DIV = opPattern(Expression.regexGroupedMultiDiv);
+    private static final Pattern PTN_ADD_SUB = opPattern(Expression.regexGroupedAddSub);
 
     //we want the display precision to be a bit less than calculated
     private MathContext mMcOperate;
@@ -28,43 +35,16 @@ public class Solver {
      * If expression is a simple number, either in scientific or
      * plain notation, toggle notation types.
      *
-     * @param exp              is the expression change notation types
-     * @param forceEngineering boolean flag to force the expression to engineering
-     *                         notation
+     * @param exp is the expression change notation types
      * @return boolean if the operation was successful
      */
-    boolean tryToggleSciNote(Expression exp, boolean forceEngineering) {
+    boolean tryToggleSciNote(Expression exp) {
         //only proceed if only a number is in the expression
         if (!exp.isOnlyValidNumber())
             return false;
 
-        //get and save query before operating on it
-//		String query = exp.toString();
-
-
-        //if we want engineering, just convert regardless if we have E already
-        if (forceEngineering) {
-            try {
-                exp.roundAndCleanExpression(Expression.NumFormat.ENGINEERING);
-            } catch (NumberFormatException e) {
-                exp.replaceExpression(strSyntaxError);
-            }
-        }
-        //determine if we are are in sci notation already
-        else if (exp.isSciNotation()) {
-            try {
-                exp.roundAndCleanExpression(Expression.NumFormat.PLAIN);
-            } catch (NumberFormatException e) {
-                exp.replaceExpression(strSyntaxError);
-            }
-        } else {
-            try {
-                exp.roundAndCleanExpression(Expression.NumFormat.SCI_NOTE);
-            } catch (NumberFormatException e) {
-                exp.replaceExpression(strSyntaxError);
-            }
-        }
-
+        roundAndClean(exp, exp.isSciNotation()
+                ? Expression.NumFormat.PLAIN : Expression.NumFormat.SCI_NOTE);
         return true;
     }
 
@@ -162,9 +142,9 @@ public class Solver {
             }
         }
         //perform other operations in proper order of operations
-        str = collapseOps(Expression.regexGroupedExponent, str);
-        str = collapseOps(Expression.regexGroupedMultiDiv, str);
-        str = collapseOps(Expression.regexGroupedAddSub, str);
+        str = collapseOps(PTN_EXPONENT, str);
+        str = collapseOps(PTN_MULT_DIV, str);
+        str = collapseOps(PTN_ADD_SUB, str);
         return str;
     }
 
@@ -172,12 +152,11 @@ public class Solver {
     /**
      * Loop over/collapse down input str, solves for either +- or /*.  places result in expression
      *
-     * @param regexOperatorType is the type of operators to look for in regex form
-     * @param str               is the string to operate upon
+     * @param ptn is the "# op #" pattern for the operators to look for
+     * @param str is the string to operate upon
      */
-    private String collapseOps(String regexOperatorType, String str) {
+    private String collapseOps(Pattern ptn, String str) {
         //find the first instance of operator in the str (we want left to right per order of operations)
-        Pattern ptn = Pattern.compile(Expression.regexGroupedNonNegNumber + regexOperatorType + Expression.regexGroupedNumber);
         Matcher mat = ptn.matcher(str);
         BigDecimal result;
         //this loop will loop through each occurrence of the "# op #" sequence
@@ -189,8 +168,8 @@ public class Solver {
             //be sure string is formatted properly
             try {
                 operand1 = new BigDecimal(mat.group(1));
-                operand2 = new BigDecimal(mat.group(Expression.numGroupsInRegexGroupedNumber + 2));
-                operator = mat.group(Expression.numGroupsInRegexGroupedNumber + 1);
+                operator = mat.group(2);
+                operand2 = new BigDecimal(mat.group(3));
             } catch (NumberFormatException e) {
                 //throw syntax error if we have a weirdly formatted string
                 str = strSyntaxError;
@@ -200,11 +179,11 @@ public class Solver {
             //perform actual operation on found operator and operands
             if (operator.equals("+")) {
                 //crude fix for 1E999999+1, which hangs the app. Could be handled better with real infinity...
-                if (operand1.scale() < -9000 || operand2.scale() < -9000)
+                if (operand1.scale() < MIN_ADD_SCALE || operand2.scale() < MIN_ADD_SCALE)
                     return strInfinityError;
                 result = operand1.add(operand2, mMcOperate);
             } else if (operator.equals("-")) {
-                if (operand1.scale() < -9000 || operand2.scale() < -9000)
+                if (operand1.scale() < MIN_ADD_SCALE || operand2.scale() < MIN_ADD_SCALE)
                     return strInfinityError;
                 result = operand1.subtract(operand2, mMcOperate);
             } else if (operator.equals("*"))
@@ -241,6 +220,11 @@ public class Solver {
             mat = ptn.matcher(str);
         }
         return str;
+    }
+
+    private static Pattern opPattern(String regexOperatorType) {
+        return Pattern.compile(Expression.regexGroupedNonNegNumber
+                + regexOperatorType + Expression.regexGroupedNumber);
     }
 
     private void roundAndClean(Expression exp, Expression.NumFormat numFormat) {

@@ -16,15 +16,15 @@ import java.util.HashMap;
 import java.util.Locale;
 
 /**
- * This class parses JSON stream from Coinmarketcap of the top 100 crypto
+ * This class parses JSON stream from Coinpaprika of crypto
  * currencies and outputs a HashMap of symbols with their current exchange rate
  */
 public class CoinpaprikaParser extends CurrencyURLParser {
-    private static final String COINMARKETCAP_API_URL =
+    private static final String COINPAPRIKA_API_URL =
             "https://api.coinpaprika.com/v1/tickers";
 
     public CoinpaprikaParser() {
-        super(COINMARKETCAP_API_URL);
+        super(COINPAPRIKA_API_URL);
     }
 
     /**

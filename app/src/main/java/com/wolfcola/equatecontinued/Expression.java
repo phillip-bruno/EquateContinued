@@ -6,8 +6,10 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 
 public class Expression {
     public static final String regexDecimal = "\\.";
@@ -18,13 +20,11 @@ public class Expression {
     public static final String regexNonNegOperators = "+/*^%";
     public static final String regexGroupedNumber = "([-]?\\d*[.]?\\d+[.]?(?:E[+-]?\\d+)?)";
     public static final String regexGroupedNonNegNumber = "((?:(?<=^)[-])?(?:(?<=[*+(/-])[-])?\\d*[.]?\\d+[.]?(?:E[+-]?\\d+)?)";
-    //this isn't really needed anymore, if want non capturing group, use ?:"
-    public static final int numGroupsInRegexGroupedNumber = 1;
     private static final String JSON_EXPRESSION = "expression";
     private static final String JSON_PRECISE = "precise";
     private static final String JSON_START = "sel_start";
     private static final String JSON_END = "sel_end";
-    private static final String JSON_SOLVED = "sel_end";
+    private static final String JSON_SOLVED = "solved";
     private static final String regexOperators = regexNonNegOperators + "-";
     private static final String regexInvalidChars = "[^0-9()E." + regexOperators + "]";
     private static final String regexHasInvalidChars = ".*" + regexInvalidChars + ".*";
@@ -75,7 +75,8 @@ public class Expression {
         //		mSelectionStart = json.getInt(JSON_START);
         //		mSelectionEnd = json.getInt(JSON_END);
 
-        setSolved(json.getBoolean(JSON_SOLVED));
+        //older saves stored the solved flag under JSON_END by mistake
+        setSolved(json.optBoolean(JSON_SOLVED, json.optBoolean(JSON_END)));
     }
 
     /**
@@ -92,7 +93,7 @@ public class Expression {
         mSelectionStart = exp.getSelectionStart();
         mSolved = exp.isSolved();
         mNumFormat = exp.mNumFormat;
-        mHighlightedCharList = exp.getHighlighted();
+        mHighlightedCharList = new ArrayList<>(exp.getHighlighted());
     }
 
     /**
@@ -107,7 +108,8 @@ public class Expression {
      */
     private static String getSciNotation(BigDecimal bd, int digits, boolean engStr) {
         String format = engStr ? "##0.0E0" : "0.0E0";
-        DecimalFormat formatter = new DecimalFormat(format);
+        //force '.' as the decimal separator; the rest of the parser assumes it
+        DecimalFormat formatter = new DecimalFormat(format, DecimalFormatSymbols.getInstance(Locale.US));
         //formatter.setRoundingMode(RoundingMode.HALF_UP);
         formatter.setMinimumFractionDigits(digits);
         return formatter.format(bd);

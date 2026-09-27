@@ -332,11 +332,12 @@ class UnitInitializer {
                 130.66, 136.19, 140.32, 144.46, 148.23, 152.38, 156.85, 160.52, 163.01,
                 166.58, 172.20, 177.07, 179.88, 183.96, 188.88, 195.29, 201.59, 207.34,
                 215.30, 214.54, 218.06, 224.94, 229.59, 232.96, 236.74, 237.02, 240.01,
-                245.12, 250.09};
+                245.12, 251.11, 255.66, 258.81, 270.97, 292.66, 304.70, 313.69,
+                321.94};
 
         ArrayList<Double> al = new ArrayList<>();
         for (double val : cpiTable) {
-            //convert values such that 1 is current 2014 dollar
+            //convert values such that 1 is the most recent year's dollar
             double normalizedValue = val / cpiTable[cpiTable.length - 1];
             al.add(normalizedValue);
         }

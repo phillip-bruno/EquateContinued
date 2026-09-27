@@ -1,4 +1,4 @@
-package com.wolfcola.equatecontinued.test;
+package com.wolfcola.equatecontinued;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -6,22 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import android.content.res.Resources;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import com.wolfcola.equatecontinued.Calculator;
-import com.wolfcola.equatecontinued.R;
-import com.wolfcola.equatecontinued.Solver;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 
-@RunWith(AndroidJUnit4.class)
 public class CalculatorJUnitTest {
 
     // Precision for display and calculations
