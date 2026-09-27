@@ -36,8 +36,8 @@ android {
         applicationId "com.wolfcola.equatecontinued"
         minSdkVersion 26
         targetSdkVersion 36
-        versionCode 25
-        versionName "2.2.15"
+        versionCode 26
+        versionName "2.2.16"
 
         testApplicationId "com.wolfcola.equatecontinued.test"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
