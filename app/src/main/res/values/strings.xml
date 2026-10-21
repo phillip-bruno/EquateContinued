@@ -124,4 +124,10 @@
         <item>key_pressure|Pressure        |Pressure</item>
         <item>key_digital |Digital Storage |Digital </item>
     </string-array>
+
+    <string name="copied_text">Copied: \"%1$s\"</string>
+    <string name="button_changed_to">Button changed to %1$s</string>
+    <string name="history_cleared">History cleared</string>
+    <string name="calculator_reset">Calculator reset</string>
+    <string name="result_deleted">Result Deleted</string>
 </resources>

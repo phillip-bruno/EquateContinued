@@ -1,6 +1,6 @@
 package com.wolfcola.equatecontinued.view;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -8,13 +8,11 @@ import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
-
-import androidx.core.content.ContextCompat;
 
 import com.google.android.material.color.MaterialColors;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
+import com.wolfcola.equatecontinued.databinding.ActivityCalcBinding;
 
 /**
  * Handles all calculator button setup: click, long-click, extra-long-click,
@@ -22,26 +20,6 @@ import com.wolfcola.equatecontinued.R;
  * its size and isolate button wiring concerns.
  */
 public class ButtonManager {
-
-    private static final int[] BUTTON_IDS = {
-            R.id.zero_button, R.id.one_button, R.id.two_button, R.id.three_button,
-            R.id.four_button, R.id.five_button, R.id.six_button, R.id.seven_button,
-            R.id.eight_button, R.id.nine_button,
-
-            R.id.plus_button,
-            R.id.minus_button,
-            R.id.multiply_button,
-            R.id.divide_button,
-            R.id.percent_button,
-
-            R.id.decimal_button,
-            R.id.equals_button,
-
-            R.id.clear_button,
-
-            R.id.open_para_button,
-            R.id.close_para_button,
-    };
 
     public interface Callback {
         void onButtonPressed(String key);
@@ -53,27 +31,28 @@ public class ButtonManager {
     }
 
     /**
-     * Wire up all calculator buttons. Returns the equals button reference.
+     * Wire up all calculator buttons.
      */
-    public static Button setup(Activity activity, Calculator calc, Callback callback) {
-        Button equalsButton = null;
+    public static void setup(ActivityCalcBinding b, Calculator calc, Callback callback) {
+        // digits first, so a button's index is its digit value
+        Button[] buttons = {
+                b.zeroButton, b.oneButton, b.twoButton, b.threeButton, b.fourButton,
+                b.fiveButton, b.sixButton, b.sevenButton, b.eightButton, b.nineButton,
 
-        for (int id : BUTTON_IDS) {
-            final Button button = activity.findViewById(id);
+                b.plusButton, b.minusButton, b.multiplyButton, b.divideButton, b.percentButton,
+                b.decimalButton, b.equalsButton, b.clearButton,
+                b.openParaButton, b.closeParaButton,
+        };
 
-            if (id == R.id.equals_button) equalsButton = button;
+        b.percentButton.setPrimaryText(calc.mPreferences.getPercentButMain());
+        b.percentButton.setSecondaryText(calc.mPreferences.getPercentButSec());
 
-            if (id == R.id.percent_button) {
-                ((AnimatedHoldButton) button)
-                        .setPrimaryText(calc.mPreferences.getPercentButMain());
-                ((AnimatedHoldButton) button)
-                        .setSecondaryText(calc.mPreferences.getPercentButSec());
-            }
+        for (int i = 0; i < buttons.length; i++) {
+            final Button button = buttons[i];
+            final String digit = i < 10 ? String.valueOf(i) : null;
 
-            button.setOnClickListener(view -> {
-                String buttonValue = resolveClickValue(view.getId(), calc);
-                callback.onButtonPressed(buttonValue);
-            });
+            button.setOnClickListener(view -> callback.onButtonPressed(
+                    digit != null ? digit : resolveClickValue(view.getId(), calc)));
 
             button.setOnLongClickListener(view -> {
                 int buttonId = view.getId();
@@ -125,9 +104,7 @@ public class ButtonManager {
             }
         }
 
-        setupBackspaceHold(activity, callback);
-
-        return equalsButton;
+        setupBackspaceHold(b, callback);
     }
 
     private static String resolveClickValue(int buttonId, Calculator calc) {
@@ -144,30 +121,23 @@ public class ButtonManager {
         if (buttonId == R.id.open_para_button) return "(";
         if (buttonId == R.id.close_para_button) return ")";
         if (buttonId == R.id.backspace_button) return "b";
-
-        // Check numerical buttons
-        for (int i = 0; i < 10; i++) {
-            if (buttonId == BUTTON_IDS[i]) {
-                return String.valueOf(i);
-            }
-        }
         return "";
     }
 
-    private static void setupBackspaceHold(Activity activity, Callback callback) {
-        ImageButton backspaceButton = activity.findViewById(R.id.backspace_button);
-        final Drawable normalDrawable = backspaceButton.getBackground();
-        backspaceButton.setOnTouchListener(new View.OnTouchListener() {
+    private static void setupBackspaceHold(ActivityCalcBinding b, Callback callback) {
+        final Context context = b.getRoot().getContext();
+        final Drawable normalDrawable = b.backspaceButton.getBackground();
+        b.backspaceButton.setOnTouchListener(new View.OnTouchListener() {
             private static final int NUM_COLOR_CHANGES = 10;
-            private final int BACKSPACE_REPEAT = ViewUtils.getLongClickTimeout(activity);
+            private final int BACKSPACE_REPEAT = ViewUtils.getLongClickTimeout(context);
             private final int COLOR_CHANGE_PERIOD = BACKSPACE_REPEAT / NUM_COLOR_CHANGES;
             private Handler mColorHoldHandler;
             private View mView;
             private int mInc;
 
             final Runnable mBackspaceColor = new Runnable() {
-                private final int mStartColor = MaterialColors.getColor(activity, com.google.android.material.R.attr.colorPrimaryContainer, 0);
-                private final int mEndColor = MaterialColors.getColor(activity, androidx.appcompat.R.attr.colorError, 0);
+                private final int mStartColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryContainer, 0);
+                private final int mEndColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorError, 0);
 
                 @Override
                 public void run() {

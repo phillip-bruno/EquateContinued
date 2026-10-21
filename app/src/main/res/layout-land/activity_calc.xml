@@ -1,4 +1,5 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/calc_root"
     android:layout_width="match_parent"
@@ -307,6 +308,7 @@
 
         <Button
             android:id="@+id/equals_button"
+            tools:viewBindingType="Button"
             style="@style/CalcButton.Equals"
             android:text="@string/equals_button" />
     </LinearLayout>

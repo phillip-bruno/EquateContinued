@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.TextView;
 
-import com.wolfcola.equatecontinued.R;
+import com.wolfcola.equatecontinued.databinding.FilterDialogListRowBinding;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -50,21 +49,18 @@ class FilterAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        FilterDialogListRowBinding binding;
 
         if (convertView == null) {
-
-            holder = new ViewHolder();
-            convertView = inflater.inflate(R.layout.filter_dialog_list_row, parent, false);
-            holder.mNameTextView = convertView.findViewById(R.id.search_dialog_name_textView);
-            holder.mAbbreviationTextView = convertView.findViewById(R.id.search_dialog_abbreviation_textView);
-            convertView.setTag(holder);
+            binding = FilterDialogListRowBinding.inflate(inflater, parent, false);
+            convertView = binding.getRoot();
+            convertView.setTag(binding);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            binding = (FilterDialogListRowBinding) convertView.getTag();
         }
-        String s = mArrayList.get(position).getUnitName();
-        holder.mNameTextView.setText(s);
-        holder.mAbbreviationTextView.setText(mArrayList.get(position).getUnitAbbreviation());
+        UnitSearchItem item = mArrayList.get(position);
+        binding.searchDialogNameTextView.setText(item.getUnitName());
+        binding.searchDialogAbbreviationTextView.setText(item.getUnitAbbreviation());
         return convertView;
     }
 
@@ -164,11 +160,5 @@ class FilterAdapter extends BaseAdapter implements Filterable {
                 return results;
             }
         };
-    }
-
-
-    private class ViewHolder {
-        TextView mNameTextView;
-        TextView mAbbreviationTextView;
     }
 }

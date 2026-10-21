@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
+import com.wolfcola.equatecontinued.databinding.FragmentConvertKeysBinding;
 import com.wolfcola.equatecontinued.unit.UnitHistCurrency;
 import com.wolfcola.equatecontinued.unit.UnitType;
 import com.wolfcola.equatecontinued.unit.UnitType.OnConvertKeyUpdateFinishedListener;
@@ -41,17 +42,6 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
     private ArrayList<Button> mConvButton;
     private Button mMoreButton;
     private int mNumConvButtons;
-    private final int[] convertButtonIds = {
-            R.id.convert_button1,
-            R.id.convert_button2,
-            R.id.convert_button3,
-            R.id.convert_button4,
-            R.id.convert_button5,
-            R.id.convert_button6,
-            R.id.convert_button7,
-            R.id.convert_button8,
-            R.id.convert_button9,
-            R.id.convert_button10};
 
     public static ConvKeysFragment newInstance(int unitTypePos) {
         Bundle args = new Bundle();
@@ -81,20 +71,25 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_convert_keys, parent, false);
+        FragmentConvertKeysBinding binding =
+                FragmentConvertKeysBinding.inflate(inflater, parent, false);
+        Button[] convertButtons = {
+                binding.convertButton1, binding.convertButton2, binding.convertButton3,
+                binding.convertButton4, binding.convertButton5, binding.convertButton6,
+                binding.convertButton7, binding.convertButton8, binding.convertButton9,
+                binding.convertButton10};
 
         mConvButton = new ArrayList<>();
 
-        mNumConvButtons = convertButtonIds.length;
+        mNumConvButtons = convertButtons.length;
 
         //if we have more than 10 unit buttons, replace last convert button with a more button
-        if (mUnitType.size() > convertButtonIds.length) {
+        if (mUnitType.size() > convertButtons.length) {
             mNumConvButtons = mNumConvButtons - 1;
 
-            mMoreButton = v.findViewById(convertButtonIds[mNumConvButtons]);
+            mMoreButton = convertButtons[mNumConvButtons];
 
             mMoreButton.setText(getText(R.string.more_button));
-            //button.setTypeface(null, Typeface.ITALIC);
 
             mMoreButton.setOnClickListener(view -> {
                 // use a list dialog with search when there are lots of units
@@ -120,7 +115,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
 
         for (int i = 0; i < mNumConvButtons; i++) {
-            Button button = v.findViewById(convertButtonIds[i]);
+            Button button = convertButtons[i];
 
             //add ellipses for long press
             if (mUnitType.size() > mNumConvButtons)
@@ -135,17 +130,9 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
 
             refreshButtonText(i);
 
-            button.setOnClickListener(view -> {
-                int viewId = view.getId();
-                for (int j = 0; j < mNumConvButtons; j++) {
-                    if (convertButtonIds[j] == viewId) {
-                        clickUnitButton(j);
-                        break;
-                    }
-                }
-            });
-
             final int buttonPos = i;
+            button.setOnClickListener(view -> clickUnitButton(buttonPos));
+
             button.setOnLongClickListener(view -> {
                 //if there are less units to display than slots, move on
                 if (mUnitType.size() <= mNumConvButtons) return true;
@@ -173,7 +160,7 @@ public class ConvKeysFragment extends Fragment implements OnConvertKeyUpdateFini
                 return false;
             });
         }
-        return v;
+        return binding.getRoot();
     }
 
     /**

@@ -14,14 +14,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -132,20 +129,11 @@ public class Calculator {
 
 
     private void loadState() throws IOException, JSONException {
-        BufferedReader reader = null;
-        try {
-            // open and read the file into a StringBuilder
-            InputStream in = mAppContext.openFileInput(FILENAME);
-            reader = new BufferedReader(new InputStreamReader(in));
-            StringBuilder jsonString = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // line breaks are omitted and irrelevant
-                jsonString.append(line);
-            }
+        try (FileInputStream in = mAppContext.openFileInput(FILENAME)) {
+            String jsonString = new String(in.readAllBytes(), StandardCharsets.UTF_8);
 
             // parse the JSON using JSONTokener
-            JSONObject jObjState = (JSONObject) new JSONTokener(jsonString.toString()).nextValue();
+            JSONObject jObjState = (JSONObject) new JSONTokener(jsonString).nextValue();
             mExpression = new Expression(jObjState.getJSONObject(JSON_EXPRESSION), DISPLAY_PRECISION);
             mPreferences = new Preferences(jObjState.getJSONObject(JSON_HINTS));
 
@@ -160,9 +148,6 @@ public class Calculator {
 
         } catch (FileNotFoundException e) {
             // we will ignore this one, since it happens when we start fresh
-        } finally {
-            if (reader != null)
-                reader.close();
         }
     }
 
@@ -179,14 +164,8 @@ public class Calculator {
         jObjState.put(JSON_UNIT_TYPE_LIST, mUnitTypeList.toJSON());
 
         // write the file to disk
-        Writer writer = null;
-        try {
-            OutputStream out = mAppContext.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            writer = new OutputStreamWriter(out);
-            writer.write(jObjState.toString());
-        } finally {
-            if (writer != null)
-                writer.close();
+        try (FileOutputStream out = mAppContext.openFileOutput(FILENAME, Context.MODE_PRIVATE)) {
+            out.write(jObjState.toString().getBytes(StandardCharsets.UTF_8));
         }
     }
 

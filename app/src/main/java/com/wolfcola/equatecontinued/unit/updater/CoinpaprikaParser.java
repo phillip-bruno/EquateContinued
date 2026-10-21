@@ -84,8 +84,8 @@ public class CoinpaprikaParser extends CurrencyURLParser {
                         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US);
                 try {
                     date = sdf.parse(last_updated);
-                } catch (java.text.ParseException e) {
-                    e.printStackTrace();
+                } catch (java.text.ParseException ignored) {
+                    // leave the date unset rather than drop the rate
                 }
 
                 Entry entry = new Entry(price, symbol, date);

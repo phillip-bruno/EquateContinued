@@ -5,7 +5,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.Result;
+import com.wolfcola.equatecontinued.databinding.FragmentResultListBinding;
+import com.wolfcola.equatecontinued.databinding.ListItemResultBinding;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class ResultListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_result_list, container, false);
+        return FragmentResultListBinding.inflate(inflater, container, false).getRoot();
     }
 
     @Override
@@ -41,7 +42,7 @@ public class ResultListFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(CalcViewModel.class);
         mResultArray = mViewModel.getCalc().getResultList();
 
-        mRecyclerView = view.findViewById(R.id.result_recycler_view);
+        mRecyclerView = FragmentResultListBinding.bind(view).resultRecyclerView;
         // Stack from the end so a short history sits against the bottom of the
         // list, directly above the live expression, instead of leaving a gap there.
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -75,9 +76,8 @@ public class ResultListFragment extends Fragment {
         @NonNull
         @Override
         public ResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_result, parent, false);
-            return new ResultViewHolder(view);
+            return new ResultViewHolder(ListItemResultBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false));
         }
 
         @Override
@@ -92,41 +92,35 @@ public class ResultListFragment extends Fragment {
         }
 
         class ResultViewHolder extends RecyclerView.ViewHolder {
-            final DynamicTextView unitDesc;
-            final TextView unitTimestamp;
-            final TextView queryText;
-            final TextView answerText;
+            final ListItemResultBinding b;
 
-            ResultViewHolder(@NonNull View itemView) {
-                super(itemView);
-                unitDesc = itemView.findViewById(R.id.list_item_result_convertUnitDesc);
-                unitTimestamp = itemView.findViewById(R.id.list_item_result_currencyTimestamp);
-                queryText = itemView.findViewById(R.id.list_item_result_textPrevQuery);
-                answerText = itemView.findViewById(R.id.list_item_result_textPrevAnswer);
+            ResultViewHolder(@NonNull ListItemResultBinding binding) {
+                super(binding.getRoot());
+                b = binding;
             }
 
             void bind(Result result) {
-                unitTimestamp.setVisibility(View.GONE);
+                b.listItemResultCurrencyTimestamp.setVisibility(View.GONE);
 
                 if (result != null && result.containsUnits()) {
                     String text = getResources().getString(R.string.word_Converted) +
                             " " + result.getQueryUnitTextLong() +
                             " " + getResources().getString(R.string.word_to) +
                             " " + result.getAnswerUnitTextLong() + ":";
-                    unitDesc.setText(ViewUtils.fromHtml("<i>" + text + "</i>"));
-                    unitDesc.setVisibility(View.VISIBLE);
+                    b.listItemResultConvertUnitDesc.setText(ViewUtils.fromHtml("<i>" + text + "</i>"));
+                    b.listItemResultConvertUnitDesc.setVisibility(View.VISIBLE);
 
                     String timestamp = result.getTimestamp();
                     if (!timestamp.equals("")) {
-                        unitTimestamp.setText(timestamp);
-                        unitTimestamp.setVisibility(View.VISIBLE);
+                        b.listItemResultCurrencyTimestamp.setText(timestamp);
+                        b.listItemResultCurrencyTimestamp.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    unitDesc.setVisibility(View.GONE);
+                    b.listItemResultConvertUnitDesc.setVisibility(View.GONE);
                 }
 
-                queryText.setText(result.getTextQuery());
-                answerText.setText(result.getTextAnswer());
+                b.listItemResultTextPrevQuery.setText(result.getTextQuery());
+                b.listItemResultTextPrevAnswer.setText(result.getTextAnswer());
 
                 // Click to load result back into expression
                 View.OnClickListener clickListener = view -> {
@@ -136,17 +130,16 @@ public class ResultListFragment extends Fragment {
                     Calculator calc = mViewModel.getCalc();
 
                     String textPassBack = "";
-                    int viewID = view.getId();
-                    if (viewID == R.id.list_item_result_textPrevQuery)
+                    if (view == b.listItemResultTextPrevQuery)
                         textPassBack = thisResult.getQueryWithoutSep();
-                    if (viewID == R.id.list_item_result_textPrevAnswer)
+                    if (view == b.listItemResultTextPrevAnswer)
                         textPassBack = thisResult.getAnswerWithoutSep();
 
                     calc.parseKeyPressed(textPassBack);
 
                     if (!calc.isUnitSelected() && thisResult.containsUnits()) {
                         int unitPosPassBack;
-                        if (viewID == R.id.list_item_result_textPrevQuery)
+                        if (view == b.listItemResultTextPrevQuery)
                             unitPosPassBack = thisResult.getQueryUnitPos();
                         else
                             unitPosPassBack = thisResult.getAnswerUnitPos();
@@ -157,15 +150,15 @@ public class ResultListFragment extends Fragment {
                     mViewModel.requestScreenUpdate(false);
                 };
 
-                queryText.setOnClickListener(clickListener);
-                answerText.setOnClickListener(clickListener);
+                b.listItemResultTextPrevQuery.setOnClickListener(clickListener);
+                b.listItemResultTextPrevAnswer.setOnClickListener(clickListener);
 
                 // Long click to delete result
                 View.OnLongClickListener longClickListener = view -> {
                     int pos = getBindingAdapterPosition();
                     if (pos == RecyclerView.NO_POSITION) return false;
 
-                    Toast toast = Toast.makeText(view.getContext(), "Result Deleted", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(view.getContext(), R.string.result_deleted, Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
 
@@ -176,8 +169,8 @@ public class ResultListFragment extends Fragment {
                     return true;
                 };
 
-                queryText.setOnLongClickListener(longClickListener);
-                answerText.setOnLongClickListener(longClickListener);
+                b.listItemResultTextPrevQuery.setOnLongClickListener(longClickListener);
+                b.listItemResultTextPrevAnswer.setOnLongClickListener(longClickListener);
             }
         }
     }

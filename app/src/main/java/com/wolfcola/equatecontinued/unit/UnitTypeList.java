@@ -86,39 +86,21 @@ public class UnitTypeList {
      * saving customizations.
      *
      * @return JSON array of Unit Types
-     * @throws JSONException
+     * @throws JSONException if a Unit Type can't be serialized
      */
-    public JSONObject toJSON() {
+    public JSONObject toJSON() throws JSONException {
         JSONObject jsonReturnObj = new JSONObject();
-        try {
-            jsonReturnObj.put(JSON_UNIT_TYPE, getCurrentKey());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        jsonReturnObj.put(JSON_UNIT_TYPE, getCurrentKey());
 
         JSONArray jUnitTypeArray = new JSONArray();
         for (UnitType u : mUnitTypes.values())
-            try {
-                jUnitTypeArray.put(u.toJSON());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        try {
-            jsonReturnObj.put(JSON_UNIT_TYPE_MAP, jUnitTypeArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            jUnitTypeArray.put(u.toJSON());
+        jsonReturnObj.put(JSON_UNIT_TYPE_MAP, jUnitTypeArray);
 
         JSONArray jOrderedKeyArray = new JSONArray();
         for (String s : mOrderedUnitKeys)
             jOrderedKeyArray.put(s);
-
-        try {
-            jsonReturnObj.put(JSON_UNIT_TYPE_ORDER, jOrderedKeyArray);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        jsonReturnObj.put(JSON_UNIT_TYPE_ORDER, jOrderedKeyArray);
 
         return jsonReturnObj;
     }

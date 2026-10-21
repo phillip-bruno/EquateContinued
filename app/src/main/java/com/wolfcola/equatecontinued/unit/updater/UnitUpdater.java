@@ -6,6 +6,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.wolfcola.equatecontinued.R;
 import com.wolfcola.equatecontinued.unit.Unit;
@@ -27,6 +28,7 @@ import java.util.concurrent.Executors;
  * Created by Evan on 10/2/2015.
  */
 public class UnitUpdater {
+    private static final String TAG = "UnitUpdater";
     private static final int UPDATE_TIMEOUT_MIN = 90;
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
@@ -139,10 +141,10 @@ public class UnitUpdater {
             cryptCurrRates.putAll(currRates);
             currRates = cryptCurrRates;
         } catch (CurrencyParseException e) {
-            e.printStackTrace();
+            Log.w(TAG, "Failed to parse currency rates", e);
             return ErrorCause.PARSING_ERROR;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.w(TAG, "Failed to download currency rates", e);
             return ErrorCause.TIMEOUT;
         }
 

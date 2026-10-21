@@ -5,9 +5,8 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
-public abstract class Unit  /*implements JsonSerializer<Unit>, JsonDeserializer<Unit> */ {
+public abstract class Unit {
     private static final String JSON_NAME = "name";
-    //	private static final String JSON_LONG_NAME = "long_name";
     private static final String JSON_VALUE = "value";
 
 
@@ -24,12 +23,6 @@ public abstract class Unit  /*implements JsonSerializer<Unit>, JsonDeserializer<
     protected Unit() {
         this("", "", 0);
     }
-
-//	protected Unit(JSONObject json) throws JSONException {
-//		this(json.getString(JSON_NAME),
-//				json.getString(JSON_LONG_NAME),
-//				json.getDouble(JSON_VALUE));
-//	}
 
     /**
      * Load in user saved data to an existing Unit.  Example of this is the
@@ -50,23 +43,6 @@ public abstract class Unit  /*implements JsonSerializer<Unit>, JsonDeserializer<
         mValue = json.getDouble(JSON_VALUE);
 
         return true; //successful
-
-      /*
-		String unitType = json.getString(JSON_TYPE);
-		String packageName = Unit.class.getPackage().getAbbreviation();
-		Unit u;
-		try {
-			Class<?> c = Class.forName(packageName + "." + unitType);
-			Constructor<?> con = c.getConstructor(JSONObject.class);
-			u = (Unit) con.newInstance(json);
-		} catch (ClassNotFoundException e) { //for Class.forName(packageName + "." + unitType);
-			throw new IllegalAccessError(unitType + " was not found");
-		}   catch (NoSuchMethodException e){ //for u = (Unit) con.newInstance(json);
-			throw new NoSuchMethodError(unitType + " doesn't have a JSONObject constructor");
-		} catch (Exception e){//for c.getConstructor(JSONObject.class);
-			throw new IllegalAccessError("problem with " + unitType + " class");
-		}
-      */
     }
 
     /**

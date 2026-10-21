@@ -9,21 +9,20 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import androidx.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.pm.PackageInfoCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
@@ -34,16 +33,18 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.wolfcola.equatecontinued.Calculator;
 import com.wolfcola.equatecontinued.R;
+import com.wolfcola.equatecontinued.databinding.ActivityCalcBinding;
+import com.wolfcola.equatecontinued.databinding.DrawerLayoutBinding;
 import com.wolfcola.equatecontinued.view.IdlingResource.SimpleIdlingResource;
 
 import java.util.HashSet;
@@ -53,12 +54,10 @@ public class CalcActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String PRIVATE_PREF = "equate_app";
     private static final String VERSION_KEY = "version_number";
+    private static final String TAG = "CalcActivity";
 
-    // Fixes Resources$NotFoundException on API < 19 when using vector drawables
-    static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-    }
-
+    private DrawerLayoutBinding mDrawerBinding;
+    private ActivityCalcBinding mBinding;     //calculator content inside the drawer
     private ResultListFragment mResultListFrag;   //scroll-able history
     private EditTextDisplay mDisplay;      //main display
     private ViewPager2 mUnitTypeViewPager;         //controls and displays UnitType
@@ -79,11 +78,13 @@ public class CalcActivity extends AppCompatActivity
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawer_layout);
+        mDrawerBinding = DrawerLayoutBinding.inflate(getLayoutInflater());
+        mBinding = mDrawerBinding.calcRoot;
+        setContentView(mDrawerBinding.getRoot());
 
         // Apply system bar insets as padding to the calculator content root so it
         // is never obscured by the status bar or navigation bar.
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.calc_root), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -91,8 +92,7 @@ public class CalcActivity extends AppCompatActivity
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mDrawerBinding.navView.setNavigationItemSelectedListener(this);
         setupDrawerBackHandling();
 
         //initialize ViewModel (survives configuration changes)
@@ -109,8 +109,8 @@ public class CalcActivity extends AppCompatActivity
         });
 
         //main result display
-        mDisplay = findViewById(R.id.textDisplay);
-        mResultPreview = findViewById(R.id.resultPreview);
+        mDisplay = mBinding.textDisplay;
+        mResultPreview = mBinding.resultPreview;
         mDisplay.setCalc(mCalc);
         mDisplay.disableSoftInputFromAppearing();
 
@@ -126,7 +126,7 @@ public class CalcActivity extends AppCompatActivity
             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             clipboard.setPrimaryClip(ClipData.newPlainText(null, copiedText));
 
-            ViewUtils.toast("Copied: \"" + copiedText + "\"", CalcActivity.this);
+            ViewUtils.toast(getString(R.string.copied_text, copiedText), CalcActivity.this);
             return true;
         });
 
@@ -163,7 +163,7 @@ public class CalcActivity extends AppCompatActivity
         }
 
 
-        ButtonManager.setup(this, mCalc, new ButtonManager.Callback() {
+        ButtonManager.setup(mBinding, mCalc, new ButtonManager.Callback() {
             @Override
             public void onButtonPressed(String key) {
                 numButtonPressed(key);
@@ -176,8 +176,7 @@ public class CalcActivity extends AppCompatActivity
 
             @Override
             public void onDrawerRequested() {
-                DrawerLayout drawer = findViewById(R.id.drawer_layout);
-                drawer.openDrawer(GravityCompat.START);
+                mDrawerBinding.getRoot().openDrawer(GravityCompat.START);
             }
 
             @Override
@@ -192,7 +191,7 @@ public class CalcActivity extends AppCompatActivity
 
             @Override
             public void onPercentButtonSwapped(AnimatedHoldButton button, String newMain, String newSec) {
-                ViewUtils.toastLong("Button changed to " + newMain, CalcActivity.this);
+                ViewUtils.toastLong(getString(R.string.button_changed_to, newMain), CalcActivity.this);
                 button.setPrimaryText(newMain);
                 button.setSecondaryText(newSec);
                 button.invalidate();
@@ -211,7 +210,7 @@ public class CalcActivity extends AppCompatActivity
             setUnitViewVisibility(UnitVisibility.VISIBLE);
         }
 
-        mUnitTypeViewPager = findViewById(R.id.unit_pager);
+        mUnitTypeViewPager = mBinding.unitPager;
         mUnitTypeViewPager.setAdapter(new FragmentStateAdapter(this) {
             @Override
             public int getItemCount() {
@@ -225,10 +224,9 @@ public class CalcActivity extends AppCompatActivity
             }
         });
 
-        TabLayout tabLayout = findViewById(R.id.unit_type_titles);
-        tabLayout.setVisibility(View.VISIBLE);
+        mBinding.unitTypeTitles.setVisibility(View.VISIBLE);
 
-        new TabLayoutMediator(tabLayout, mUnitTypeViewPager,
+        new TabLayoutMediator(mBinding.unitTypeTitles, mUnitTypeViewPager,
                 (tab, pos) -> tab.setText(mCalc.getUnitTypeName(pos % mCalc.getUnitTypeSize()))
         ).attach();
 
@@ -311,7 +309,7 @@ public class CalcActivity extends AppCompatActivity
                                 case 1:
                                     new MaterialAlertDialogBuilder(CalcActivity.this)
                                             .setMessage(getText(R.string.reset_factory_msg))
-                                            .setPositiveButton(android.R.string.yes, (d, w) -> resetCalculator())
+                                            .setPositiveButton(android.R.string.ok, (d, w) -> resetCalculator())
                                             .setNegativeButton(android.R.string.cancel, null)
                                             .show();
                                     break;
@@ -329,7 +327,7 @@ public class CalcActivity extends AppCompatActivity
 
         updateScreen(true);
 
-        ViewUtils.toastCentered("History cleared", this);
+        ViewUtils.toastCentered(getString(R.string.history_cleared), this);
     }
 
     /**
@@ -348,7 +346,7 @@ public class CalcActivity extends AppCompatActivity
 
         updateScreen(true);
 
-        ViewUtils.toastCentered("Calculator reset", this);
+        ViewUtils.toastCentered(getString(R.string.calculator_reset), this);
     }
 
     /**
@@ -365,7 +363,7 @@ public class CalcActivity extends AppCompatActivity
             PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(), 0);
             currentVersionNumber = (int) PackageInfoCompat.getLongVersionCode(pi);
         } catch (Exception e) {
-            android.util.Log.e("CalcActivity", "Failed to get version info", e);
+            Log.e(TAG, "Failed to get version info", e);
         }
 
         if (currentVersionNumber > savedVersionNumber) {
@@ -375,7 +373,7 @@ public class CalcActivity extends AppCompatActivity
 
             builder.setTitle(getText(R.string.whats_new))
                     .setMessage(getText(R.string.version_description))
-                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
 
             builder.create().show();
 
@@ -397,11 +395,8 @@ public class CalcActivity extends AppCompatActivity
         if (visibleUnitTypeIndex == -1) {
             //load in Unit Type arrangement prefs
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            Set<String> storedSet = sharedPref.getStringSet(
-                    SettingsActivity.UNIT_TYPE_PREF_KEY, null);
-
-            assert storedSet != null; // not sure why we'd have a null pref
-            HashSet<String> selections = new HashSet<>(storedSet);
+            HashSet<String> selections = new HashSet<>(sharedPref.getStringSet(
+                    SettingsActivity.UNIT_TYPE_PREF_KEY, Set.of()));
             selections.add(unitTypeKey);
             sharedPref.edit().putStringSet(
                     SettingsActivity.UNIT_TYPE_PREF_KEY, selections).apply();
@@ -424,14 +419,14 @@ public class CalcActivity extends AppCompatActivity
     }
 
     private void setUnitViewVisibility(UnitVisibility uv) {
-        final LinearLayout mUnitContain = findViewById(R.id.unit_container);
+        View unitContainer = mBinding.unitContainer;
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (uv == UnitVisibility.HIDDEN || mCalc.getUnitTypeSize() == 0 ||
-                    (uv == UnitVisibility.TOGGLE && mUnitContain.getVisibility() == LinearLayout.VISIBLE))
-                mUnitContain.setVisibility(LinearLayout.GONE);
+                    (uv == UnitVisibility.TOGGLE && unitContainer.getVisibility() == View.VISIBLE))
+                unitContainer.setVisibility(View.GONE);
             else {
-                mUnitContain.setVisibility(LinearLayout.VISIBLE);
+                unitContainer.setVisibility(View.VISIBLE);
                 //update the screen to move result list up
                 updateScreen(true, true);
             }
@@ -546,19 +541,18 @@ public class CalcActivity extends AppCompatActivity
                 pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 version = pInfo.versionName;
             } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to get version info", e);
             }
 
             new MaterialAlertDialogBuilder(this)
                     .setTitle(getText(R.string.about_title))
                     .setMessage(getText(R.string.about_version) + version +
                             "\n\n" + getText(R.string.about_message))
-                    .setPositiveButton(android.R.string.yes, null)
+                    .setPositiveButton(android.R.string.ok, null)
                     .show();
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        mDrawerBinding.getRoot().closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -567,7 +561,7 @@ public class CalcActivity extends AppCompatActivity
      * the default behavior
      */
     private void setupDrawerBackHandling() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = mDrawerBinding.getRoot();
         OnBackPressedCallback closeDrawer = new OnBackPressedCallback(false) {
             @Override
             public void handleOnBackPressed() {
@@ -596,17 +590,13 @@ public class CalcActivity extends AppCompatActivity
         try {
             Calculator.getCalculator(this).saveState();
         } catch (Exception e) {
-            android.util.Log.e("CalcActivity", "Failed to save calculator state", e);
+            Log.e(TAG, "Failed to save calculator state", e);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        //maybe fixes that random crash?
-        if (mCalc == null)
-            return;
 
         //load in Unit Type arrangement prefs
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -618,9 +608,6 @@ public class CalcActivity extends AppCompatActivity
 
         setupUnitTypePager();
 
-        // if the Unit Type configuration changed, update tab indicator accordingly
-//		if (selectionChanged)
-
         if (mCalc.getCurrUnitType().containsDynamicUnits())
             mCalc.refreshAllDynamicUnits(false);
 
@@ -629,7 +616,6 @@ public class CalcActivity extends AppCompatActivity
             mDisplay.setText(R.string.app_name);
             mDisplay.setCursorVisible(false);
         } else {
-            //	updateScreen(true, true);
             mDisplay.setSelectionToEnd();
             //pull ListFrag's focus, to be sure EditText's cursor blinks when app starts
             mDisplay.requestFocus();
@@ -638,9 +624,9 @@ public class CalcActivity extends AppCompatActivity
     }
 
     /**
-     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     * Creates and returns the {@link SimpleIdlingResource} used by Espresso tests.
      */
-//	@VisibleForTesting
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
     @NonNull
     public SimpleIdlingResource getIdlingResource() {
         if (mIdlingResource == null) {
